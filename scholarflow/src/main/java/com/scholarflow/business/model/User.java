@@ -1,5 +1,6 @@
 package com.scholarflow.business.model;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.time.LocalDateTime;
 
@@ -27,11 +28,11 @@ public final class User {
         final LocalDateTime createdAt
     ) {
         this.id = id;
-        this.username = username;
-        this.passwordHash = passwordHash;
-        this.email = email;
-        this.fullName = fullName;
-        this.role = role;
+        this.username = Objects.requireNonNull(username, "username cannot be null");
+        this.passwordHash = Objects.requireNonNull(passwordHash, "passwordHash cannot be null");
+        this.email = Objects.requireNonNull(email, "email cannot be null");
+        this.fullName = Objects.requireNonNull(fullName, "fullName cannot be null");
+        this.role = Objects.requireNonNull(role, "role cannot be null");
         this.fieldId = fieldId;
         this.active = active;
         this.createdAt = createdAt;

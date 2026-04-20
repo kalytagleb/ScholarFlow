@@ -1,6 +1,5 @@
 package com.scholarflow.data.jdbc;
 
-import java.lang.classfile.ClassFile.Option;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -154,6 +153,7 @@ public final class JdbcUserRepository implements UserRepository {
             stmt.setString(3, user.role());
             stmt.setObject(4, user.fieldId());
             stmt.setObject(5, user.id());
+            stmt.executeUpdate();
         } catch (SQLException ex) {
             throw new RepositoryException(
                 String.format("Error of user update: %s", user.id()), ex
