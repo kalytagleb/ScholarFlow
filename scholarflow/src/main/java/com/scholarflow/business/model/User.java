@@ -1,19 +1,20 @@
 package com.scholarflow.business.model;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.time.LocalDateTime;
 
 public final class User {
-    private final UUID id;
+    private final Optional<UUID> id;
     private final String username;
     private final String passwordHash;
     private final String email;
     private final String fullName;
     private final String role;
-    private final UUID fieldId;
+    private final Optional<UUID> fieldId;
     private final boolean active;
-    private final LocalDateTime createdAt;
+    private final Optional<LocalDateTime> createdAt;
 
     // Full constructor (for reading from DB)
     public User(
@@ -27,15 +28,15 @@ public final class User {
         final boolean active,
         final LocalDateTime createdAt
     ) {
-        this.id = id;
+        this.id = Optional.of(Objects.requireNonNull(id, "ID cannot be null in this constructor"));
         this.username = Objects.requireNonNull(username, "username cannot be null");
         this.passwordHash = Objects.requireNonNull(passwordHash, "passwordHash cannot be null");
         this.email = Objects.requireNonNull(email, "email cannot be null");
         this.fullName = Objects.requireNonNull(fullName, "fullName cannot be null");
         this.role = Objects.requireNonNull(role, "usename cannot be null");
-        this.fieldId = fieldId;
+        this.fieldId = Optional.ofNullable(fieldId);
         this.active = active;
-        this.createdAt = createdAt;
+        this.createdAt = Optional.of(Objects.requireNonNull(createdAt, "createdAt cannot be null"));
     }
 
     // For creating new user
@@ -47,20 +48,18 @@ public final class User {
         final String role,
         final UUID fieldId
     ) {
-        this(
-            null,
-            username,
-            passwordHash,
-            email,
-            fullName,
-            role,
-            fieldId,
-            true,
-            null
-        );
+        this.id = Optional.empty();
+        this.username = Objects.requireNonNull(username);
+        this.passwordHash = Objects.requireNonNull(passwordHash);
+        this.email = Objects.requireNonNull(email);
+        this.fullName = Objects.requireNonNull(fullName);
+        this.role = Objects.requireNonNull(role);
+        this.fieldId = Optional.ofNullable(fieldId);
+        this.active = true;
+        this.createdAt = Optional.empty();
     }
 
-    public UUID id() {
+    public Optional<UUID> id() {
         return id;
     }
 
@@ -84,7 +83,7 @@ public final class User {
         return role;
     }
 
-    public UUID fieldId() {
+    public Optional<UUID> fieldId() {
         return fieldId;
     }
 
@@ -92,39 +91,41 @@ public final class User {
         return active;
     }
 
-    public LocalDateTime createdAt() {
+    public Optional<LocalDateTime> createdAt() {
         return createdAt;
     }
 
     // Object must have behavior (not only data storage)
-    public boolean isAdmin() {
+    public boolean hasAdminPrivileges() {
         return "ADMIN".equals(this.role);
     }
 
-    public boolean isResearcher() {
-        return "RESEARCHER".equals(this.role);
+    public boolean canSubmitPapers() {
+        return "RESEARCHER".equals(this.role) || "ADMIN".equals(this.role);
     }
 
-    public boolean isReviewer() {
-        return "REVIEWER".equals(this.role);
+    public boolean canReview() {
+        return "REVIEWER".equals(this.role) || "ADMIN".equals(this.role);
     }
 
     @Override
     public String toString() {
-        return String.format("User{id=%s, username='%s', role='%s', active=%b}",
-            id, username, role, active
-         );
+        return String.format("User{id=%s, username='%s', role='%s'}",
+            id.map(UUID::toString).orElse("NEW"),
+            username, 
+            role
+        );
     }
 
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof User other)) return false;
-        return id != null && id.equals(other.id);
+        return id.isPresent() && other.id.isPresent() && id.get().equals(other.id.get());
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return id.map(UUID::hashCode).orElse(0);
     }
 }

@@ -3,6 +3,7 @@ package com.scholarflow.business.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import com.scholarflow.business.model.User;
 import com.scholarflow.data.repository.UserRepository;
@@ -11,8 +12,23 @@ public final class UserService {
 
     private final UserRepository userRepository;
 
+    private final Pattern emailPattern = Pattern.compile(
+        "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$",
+        Pattern.CASE_INSENSITIVE
+    );
+
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    private void validateEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+
+        if (!emailPattern.matcher(email).matches()) {
+            throw new IllegalArgumentException("Invalid email format: " + email);
+        }
     }
 
     // Register new user
@@ -21,9 +37,9 @@ public final class UserService {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("Username cannot be empty");
         }
-        if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("Email cannot be empty");
-        }
+
+        this.validateEmail(email);
+
         if (passwordHash == null || passwordHash.isBlank()) {
             throw new IllegalArgumentException("Password hash cannot be empty");
         }
@@ -63,21 +79,31 @@ public final class UserService {
     }
 
     public User updateProfile(UUID id, String fullName, String email) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        User user = optionalUser.orElseThrow(() -> 
-            new IllegalArgumentException("User not found with id: " + id)
-        );
+        if (fullName == null || fullName.isBlank()) {
+            throw new IllegalArgumentException("Full name cannot be empty");
+        }
+
+        this.validateEmail(email);
+
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+
+        if (!user.email().equalsIgnoreCase(email)) {
+            if (userRepository.findByEmail(email).isPresent()) {
+                throw new IllegalArgumentException("Email '" + email + "' is already taken");
+            }
+        }
 
         User updatedUser = new User(
-            user.id(),
+            user.id().orElseThrow(),
             user.username(),
             user.passwordHash(),
             email,
             fullName,
             user.role(),
-            user.fieldId(),
+            user.fieldId().orElse(null),
             user.isActive(),
-            user.createdAt()
+            user.createdAt().orElseThrow()
         );
 
         userRepository.update(updatedUser);
