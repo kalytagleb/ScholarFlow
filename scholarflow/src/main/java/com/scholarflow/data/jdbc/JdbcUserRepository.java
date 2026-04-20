@@ -11,22 +11,22 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.scholarflow.business.model.User;
-import com.scholarflow.data.connection.DatabaseConnection;
 import com.scholarflow.data.repository.UserRepository;
+import com.scholarflow.data.connection.DatabaseConnectionPool;
 import com.scholarflow.data.exception.*;
 
 public final class JdbcUserRepository implements UserRepository {
-    private final DatabaseConnection db;
+    private final DatabaseConnectionPool pool;
 
-    public JdbcUserRepository(final DatabaseConnection db) {
-        this.db = db;
+    public JdbcUserRepository(final DatabaseConnectionPool pool) {
+        this.pool = pool;
     }
 
     @Override
     public Optional<User> findById(final UUID id) {
         final String sql = "SELECT * FROM users WHERE id = ?";
 
-        try (Connection conn = db.connection();
+        try (Connection conn = pool.connection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setObject(1, id);
@@ -48,7 +48,7 @@ public final class JdbcUserRepository implements UserRepository {
     public Optional<User> findByUsername(final String username) {
         final String sql = "SELECT * FROM users WHERE username = ?";
 
-        try (Connection conn = db.connection(); 
+        try (Connection conn = pool.connection(); 
             PreparedStatement stmt = conn.prepareStatement(sql)) {
                 
             stmt.setString(1, username);
@@ -71,7 +71,7 @@ public final class JdbcUserRepository implements UserRepository {
 
         final List<User> users = new ArrayList<>();
 
-        try (Connection conn = db.connection();
+        try (Connection conn = pool.connection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery()) {
 
@@ -92,7 +92,7 @@ public final class JdbcUserRepository implements UserRepository {
 
         final List<User> users = new ArrayList<>();
 
-        try (Connection conn = db.connection();
+        try (Connection conn = pool.connection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, role);
@@ -117,7 +117,7 @@ public final class JdbcUserRepository implements UserRepository {
                 RETURNING *
                 """;
 
-        try (Connection conn = db.connection();
+        try (Connection conn = pool.connection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.username());
@@ -146,7 +146,7 @@ public final class JdbcUserRepository implements UserRepository {
                 WHERE id = ?
                 """;
         
-        try (Connection conn = db.connection();
+        try (Connection conn = pool.connection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, user.email());
@@ -165,7 +165,7 @@ public final class JdbcUserRepository implements UserRepository {
     public void deactivate(final UUID id) {
         final String sql = "UPDATE users SET is_active = false WHERE id = ?";
 
-        try (Connection conn = db.connection();
+        try (Connection conn = pool.connection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setObject(1, id);
