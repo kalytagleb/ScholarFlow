@@ -3,6 +3,7 @@ package com.scholarflow.data.repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import com.scholarflow.business.model.User;
 
 public interface UserRepository {
     Optional<User> findById(UUID id);
