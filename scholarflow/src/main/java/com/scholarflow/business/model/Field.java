@@ -1,14 +1,15 @@
 package com.scholarflow.business.model;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 public final class Field {
 
-    private final UUID id;
+    private final Optional<UUID> id;
     private final String nameEn;
     private final String nameSk;
-    private final String description;
+    private final Optional<String> description;
 
     // Used for loading from database
     public Field(
@@ -17,10 +18,10 @@ public final class Field {
         final String nameSk,
         final String description
     ) {
-        this.id = Objects.requireNonNull(id, "id cannot be null");
+        this.id = Optional.of(Objects.requireNonNull(id));
         this.nameEn = Objects.requireNonNull(nameEn, "nameEn cannot be null");
         this.nameSk = Objects.requireNonNull(nameSk, "nameSk cannot be null");
-        this.description = description; // can be null
+        this.description = Optional.ofNullable(description); // can be null
     }
 
     // Constructor for creating new field
@@ -29,10 +30,13 @@ public final class Field {
         final String nameSk,
         final String description
     ) {
-        this(null, nameEn, nameSk, description);
+        this.id = Optional.empty();
+        this.nameEn = Objects.requireNonNull(nameEn);
+        this.nameSk = Objects.requireNonNull(nameSk);
+        this.description = Optional.ofNullable(description);
     }
 
-    public UUID id() {
+    public Optional<UUID> id() {
         return id;
     }
 
@@ -44,11 +48,11 @@ public final class Field {
         return nameSk;
     }
 
-    public String description() {
+    public Optional<String> description() {
         return description;
     }
 
-    public String getName(String language) {
+    public String localizedName(String language) {
         if ("sk".equalsIgnoreCase(language)) {
             return nameSk;
         }

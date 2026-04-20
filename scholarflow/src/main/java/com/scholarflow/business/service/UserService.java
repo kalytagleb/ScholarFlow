@@ -24,12 +24,15 @@ public final class UserService {
         if (email == null || email.isBlank()) {
             throw new IllegalArgumentException("Email cannot be empty");
         }
+        if (passwordHash == null || passwordHash.isBlank()) {
+            throw new IllegalArgumentException("Password hash cannot be empty");
+        }
 
         if (userRepository.findByUsername(username).isPresent()) {
-            throw new IllegalArgumentException("Username already exists");
+            throw new IllegalArgumentException("Username '" + username + "' already exists");
         }
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new IllegalArgumentException("Email '" + email + "' already exists");
         }
 
         User newUser = new User(username, passwordHash, email, fullName, role, fieldId);
@@ -42,6 +45,10 @@ public final class UserService {
 
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     public List<User> findAllActive() {

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -62,6 +63,28 @@ public final class JdbcUserRepository implements UserRepository {
                 String.format("Error of user search by username: %s", username), ex
             );
         }
+    }
+
+    @Override 
+    public Optional<User> findByEmail(final String email) {
+        final String sql = "SELECT * FROM users WHERE email = ?";
+
+        try (Connection conn = pool.connection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, email);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(this.map(rs));
+                }
+                return Optional.empty();
+            }
+        } catch (SQLException ex) {
+            throw new RepositoryException(
+                String.format("Error of user search by email: %s", email), ex
+            );
+        } 
     }
 
     @Override
@@ -187,7 +210,7 @@ public final class JdbcUserRepository implements UserRepository {
             rs.getString("role"),
             rs.getObject("field_id", UUID.class),
             rs.getBoolean("is_active"),
-            rs.getTimestamp("created_at").toLocalDateTime()
+            rs.getObject("created_at", LocalDateTime.class)
         );
     }
 }

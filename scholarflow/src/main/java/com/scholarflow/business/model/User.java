@@ -32,7 +32,7 @@ public final class User {
         this.passwordHash = Objects.requireNonNull(passwordHash, "passwordHash cannot be null");
         this.email = Objects.requireNonNull(email, "email cannot be null");
         this.fullName = Objects.requireNonNull(fullName, "fullName cannot be null");
-        this.role = Objects.requireNonNull(role, "role cannot be null");
+        this.role = Objects.requireNonNull(role, "usename cannot be null");
         this.fieldId = fieldId;
         this.active = active;
         this.createdAt = createdAt;
