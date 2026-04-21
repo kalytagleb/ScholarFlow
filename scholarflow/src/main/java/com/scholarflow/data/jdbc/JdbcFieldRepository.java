@@ -44,6 +44,27 @@ public final class JdbcFieldRepository implements FieldRepository {
     }
 
     @Override
+    public Optional<Field> findByName(final String nameEn, final String nameSk) {
+        final String sql = "SELECT * FROM fields WHERE LOWER(name_en) = LOWER(?) OR LOWER(name_sk) = LOWER(?)";
+
+        try (Connection conn = pool.connection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, nameEn);
+            stmt.setString(2, nameSk);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(this.map(rs));
+                }
+                return Optional.empty();
+            }
+        } catch (SQLException ex) {
+            throw new RepositoryException("Error searching field by names", ex);
+        }
+    }
+
+    @Override
     public List<Field> findAll() {
         final String sql = "SELECT * FROM fields ORDER BY name_en";
 
@@ -99,7 +120,7 @@ public final class JdbcFieldRepository implements FieldRepository {
         }
         final String sql = """
                 UPDATE fields
-                SET name_en = ?, name_sk = ?, description = ?,
+                SET name_en = ?, name_sk = ?, description = ?
                 WHERE id = ?
                 """;
         

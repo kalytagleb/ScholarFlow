@@ -8,6 +8,7 @@ import com.scholarflow.business.model.Field;
 
 public interface FieldRepository {
     Optional<Field> findById(UUID id);
+    Optional<Field> findByName(String nameEn, String nameSk);
     List<Field> findAll();
     Field save(Field field);
     void update(Field field);

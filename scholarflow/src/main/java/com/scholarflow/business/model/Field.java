@@ -3,8 +3,12 @@ package com.scholarflow.business.model;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 public final class Field {
+
+    private static final Pattern NAME_PATTERN = 
+        Pattern.compile("^[\\\\p{L}]+(?:[- ][\\\\p{L}]+)*$");
 
     private final Optional<UUID> id;
     private final String nameEn;
@@ -13,27 +17,37 @@ public final class Field {
 
     // Used for loading from database
     public Field(
-        final UUID id,
-        final String nameEn,
-        final String nameSk,
-        final String description
+        UUID id,
+        String nameEn,
+        String nameSk,
+        String description
     ) {
         this.id = Optional.of(Objects.requireNonNull(id));
-        this.nameEn = Objects.requireNonNull(nameEn, "nameEn cannot be null");
-        this.nameSk = Objects.requireNonNull(nameSk, "nameSk cannot be null");
+        this.nameEn = validate(nameEn, "English name");
+        this.nameSk = validate(nameSk, "Slovak name");
         this.description = Optional.ofNullable(description); // can be null
     }
 
     // Constructor for creating new field
     public Field(
-        final String nameEn,
-        final String nameSk,
-        final String description
+        String nameEn,
+        String nameSk,
+        String description
     ) {
         this.id = Optional.empty();
-        this.nameEn = Objects.requireNonNull(nameEn);
-        this.nameSk = Objects.requireNonNull(nameSk);
+        this.nameEn = validate(nameEn, "English name");
+        this.nameSk = validate(nameSk, "Slovak name");
         this.description = Optional.ofNullable(description);
+    }
+
+    private String validate(String name, String label) {
+        Objects.requireNonNull(name, label + " cannot be null");
+        if (!NAME_PATTERN.matcher(name).matches()) {
+            throw new IllegalArgumentException(
+                String.format("%s '%s' is invalid.", label, name)
+            );
+        }
+        return name;
     }
 
     public Optional<UUID> id() {
@@ -53,10 +67,7 @@ public final class Field {
     }
 
     public String localizedName(String language) {
-        if ("sk".equalsIgnoreCase(language)) {
-            return nameSk;
-        }
-        return nameEn;
+        return "sk".equalsIgnoreCase(language) ? nameSk : nameEn;
     }
 
     public boolean isSame(Field other) {
