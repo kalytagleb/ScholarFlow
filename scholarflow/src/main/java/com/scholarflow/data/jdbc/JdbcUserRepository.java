@@ -147,11 +147,13 @@ public final class JdbcUserRepository implements UserRepository {
             stmt.setString(3, user.email());
             stmt.setString(4, user.fullName());
             stmt.setString(5, user.role());
-            stmt.setObject(6, user.fieldId());
+            stmt.setObject(6, user.fieldId().orElse(null));
 
             try (ResultSet rs = stmt.executeQuery()) {
-                rs.next();
-                return this.map(rs);
+                if (rs.next()) {
+                    return this.map(rs);
+                }
+                throw new RepositoryException("Save failed");
             } 
         } catch (SQLException ex) {
             throw new RepositoryException(
@@ -174,8 +176,8 @@ public final class JdbcUserRepository implements UserRepository {
             stmt.setString(1, user.email());
             stmt.setString(2, user.fullName());
             stmt.setString(3, user.role());
-            stmt.setObject(4, user.fieldId());
-            stmt.setObject(5, user.id());
+            stmt.setObject(4, user.fieldId().orElse(null));
+            stmt.setObject(5, user.id().orElseThrow(() -> new RepositoryException("Missing ID for update")));
             stmt.executeUpdate();
         } catch (SQLException ex) {
             throw new RepositoryException(

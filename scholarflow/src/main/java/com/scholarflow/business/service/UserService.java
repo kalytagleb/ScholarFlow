@@ -12,37 +12,12 @@ public final class UserService {
 
     private final UserRepository userRepository;
 
-    private final Pattern emailPattern = Pattern.compile(
-        "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$",
-        Pattern.CASE_INSENSITIVE
-    );
-
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    private void validateEmail(String email) {
-        if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("Email cannot be empty");
-        }
-
-        if (!emailPattern.matcher(email).matches()) {
-            throw new IllegalArgumentException("Invalid email format: " + email);
-        }
-    }
-
     // Register new user
     public User registerUser(String username, String passwordHash, String email, String fullName, String role, UUID fieldId) {
-        
-        if (username == null || username.isBlank()) {
-            throw new IllegalArgumentException("Username cannot be empty");
-        }
-
-        this.validateEmail(email);
-
-        if (passwordHash == null || passwordHash.isBlank()) {
-            throw new IllegalArgumentException("Password hash cannot be empty");
-        }
 
         if (userRepository.findByUsername(username).isPresent()) {
             throw new IllegalArgumentException("Username '" + username + "' already exists");
@@ -79,34 +54,27 @@ public final class UserService {
     }
 
     public User updateProfile(UUID id, String fullName, String email) {
-        if (fullName == null || fullName.isBlank()) {
-            throw new IllegalArgumentException("Full name cannot be empty");
-        }
 
-        this.validateEmail(email);
-
-        User user = userRepository.findById(id)
+        User existing = userRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
 
-        if (!user.email().equalsIgnoreCase(email)) {
-            if (userRepository.findByEmail(email).isPresent()) {
-                throw new IllegalArgumentException("Email '" + email + "' is already taken");
-            }
+        if (!existing.email().equalsIgnoreCase(email) && userRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("Email '" + email + "' is already taken");
         }
 
-        User updatedUser = new User(
-            user.id().orElseThrow(),
-            user.username(),
-            user.passwordHash(),
+        User updated = new User(
+            id,
+            existing.username(),
+            existing.passwordHash(),
             email,
             fullName,
-            user.role(),
-            user.fieldId().orElse(null),
-            user.isActive(),
-            user.createdAt().orElseThrow()
+            existing.role(),
+            existing.fieldId().orElse(null),
+            existing.isActive(),
+            existing.createdAt().orElseThrow()
         );
 
-        userRepository.update(updatedUser);
-        return updatedUser;
+        userRepository.update(updated);
+        return updated;
     }
 }

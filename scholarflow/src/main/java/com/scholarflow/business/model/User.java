@@ -3,9 +3,13 @@ package com.scholarflow.business.model;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.time.LocalDateTime;
 
 public final class User {
+    private static final Pattern EMAIL_REGEX = 
+        Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
     private final Optional<UUID> id;
     private final String username;
     private final String passwordHash;
@@ -18,20 +22,20 @@ public final class User {
 
     // Full constructor (for reading from DB)
     public User(
-        final UUID id,
-        final String username,
-        final String passwordHash,
-        final String email,
-        final String fullName,
-        final String role,
-        final UUID fieldId,
-        final boolean active,
-        final LocalDateTime createdAt
+        UUID id,
+        String username,
+        String passwordHash,
+        String email,
+        String fullName,
+        String role,
+        UUID fieldId,
+        boolean active,
+        LocalDateTime createdAt
     ) {
         this.id = Optional.of(Objects.requireNonNull(id, "ID cannot be null in this constructor"));
         this.username = Objects.requireNonNull(username, "username cannot be null");
         this.passwordHash = Objects.requireNonNull(passwordHash, "passwordHash cannot be null");
-        this.email = Objects.requireNonNull(email, "email cannot be null");
+        this.email = validateEmail(email);
         this.fullName = Objects.requireNonNull(fullName, "fullName cannot be null");
         this.role = Objects.requireNonNull(role, "usename cannot be null");
         this.fieldId = Optional.ofNullable(fieldId);
@@ -41,22 +45,29 @@ public final class User {
 
     // For creating new user
     public User (
-        final String username,
-        final String passwordHash,
-        final String email,
-        final String fullName,
-        final String role,
-        final UUID fieldId
+        String username,
+        String passwordHash,
+        String email,
+        String fullName,
+        String role,
+        UUID fieldId
     ) {
         this.id = Optional.empty();
         this.username = Objects.requireNonNull(username);
         this.passwordHash = Objects.requireNonNull(passwordHash);
-        this.email = Objects.requireNonNull(email);
+        this.email = validateEmail(email);
         this.fullName = Objects.requireNonNull(fullName);
         this.role = Objects.requireNonNull(role);
         this.fieldId = Optional.ofNullable(fieldId);
         this.active = true;
         this.createdAt = Optional.empty();
+    }
+
+    private String validateEmail(String email) {
+        if (email == null || !EMAIL_REGEX.matcher(email).matches()) {
+            throw new IllegalArgumentException("Invalid email format: " + email);
+        }
+        return email;
     }
 
     public Optional<UUID> id() {
