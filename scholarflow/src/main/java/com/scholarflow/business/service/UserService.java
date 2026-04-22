@@ -3,7 +3,6 @@ package com.scholarflow.business.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 import com.scholarflow.business.model.User;
 import com.scholarflow.data.repository.UserRepository;
@@ -16,9 +15,12 @@ public final class UserService {
         this.userRepository = userRepository;
     }
 
-    // Register new user
-    public User registerUser(String username, String passwordHash, String email, String fullName, String role, UUID fieldId) {
+    public Optional<User> authenticate(String username, String password) {
+        return userRepository.findByUsername(username)
+            .filter(user -> user.passwordMatches(password));
+    }
 
+    public User registerUser(String username, String plainPassword, String email, String fullName, String role, UUID fieldId) {
         if (userRepository.findByUsername(username).isPresent()) {
             throw new IllegalArgumentException("Username '" + username + "' already exists");
         }
@@ -26,7 +28,7 @@ public final class UserService {
             throw new IllegalArgumentException("Email '" + email + "' already exists");
         }
 
-        User newUser = new User(username, passwordHash, email, fullName, role, fieldId);
+        final User newUser = new User(username, plainPassword, email, fullName, role, fieldId);
         return userRepository.save(newUser);
     }
 

@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 
 public final class Field {
 
-    private static final Pattern NAME_PATTERN = 
-        Pattern.compile("^[\\\\p{L}]+(?:[- ][\\\\p{L}]+)*$");
+    private static final Pattern NAME_PATTERN =
+        Pattern.compile("^[\\p{L}]+(?:[- ][\\p{L}]+)*$");
 
     private final Optional<UUID> id;
     private final String nameEn;
@@ -84,11 +84,11 @@ public final class Field {
     public boolean equals(final Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Field other)) return false;
-        return id != null && id.equals(other.id);
+        return id.isPresent() && other.id.isPresent() && id.get().equals(other.id.get());
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return id.map(UUID::hashCode).orElse(0);
     }
 }

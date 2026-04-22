@@ -4,11 +4,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
+
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.time.LocalDateTime;
 
 public final class User {
-    private static final Pattern EMAIL_REGEX = 
-        Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern EMAIL_REGEX =
+        Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
     private final Optional<UUID> id;
     private final String username;
@@ -37,7 +40,7 @@ public final class User {
         this.passwordHash = Objects.requireNonNull(passwordHash, "passwordHash cannot be null");
         this.email = validateEmail(email);
         this.fullName = Objects.requireNonNull(fullName, "fullName cannot be null");
-        this.role = Objects.requireNonNull(role, "usename cannot be null");
+        this.role = Objects.requireNonNull(role, "role cannot be null");
         this.fieldId = Optional.ofNullable(fieldId);
         this.active = active;
         this.createdAt = Optional.of(Objects.requireNonNull(createdAt, "createdAt cannot be null"));
@@ -46,7 +49,7 @@ public final class User {
     // For creating new user
     public User (
         String username,
-        String passwordHash,
+        String plainPassword,
         String email,
         String fullName,
         String role,
@@ -54,13 +57,25 @@ public final class User {
     ) {
         this.id = Optional.empty();
         this.username = Objects.requireNonNull(username);
-        this.passwordHash = Objects.requireNonNull(passwordHash);
+        this.passwordHash = hash(plainPassword);
         this.email = validateEmail(email);
         this.fullName = Objects.requireNonNull(fullName);
         this.role = Objects.requireNonNull(role);
         this.fieldId = Optional.ofNullable(fieldId);
         this.active = true;
         this.createdAt = Optional.empty();
+    }
+
+    private String hash(String password) {
+        if (password == null || password.length() < 8) {
+            throw new IllegalArgumentException("Password must be at least 8 characters");
+        }
+        return BCrypt.hashpw(password, BCrypt.gensalt(12));
+    }
+
+    // Object checks his password
+    public boolean passwordMatches(String candidate) {
+        return BCrypt.checkpw(candidate, this.passwordHash);
     }
 
     private String validateEmail(String email) {

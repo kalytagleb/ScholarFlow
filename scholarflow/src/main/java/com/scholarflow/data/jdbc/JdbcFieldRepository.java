@@ -116,7 +116,7 @@ public final class JdbcFieldRepository implements FieldRepository {
     @Override
     public void update(final Field field) {
         if (field.id().isEmpty()) {
-            throw new RepositoryException("nulCannot update field without ID");
+            throw new RepositoryException("Cannot update field without ID");
         }
         final String sql = """
                 UPDATE fields

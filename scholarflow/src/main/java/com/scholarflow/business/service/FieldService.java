@@ -26,14 +26,6 @@ public final class FieldService {
         return this.repository.save(field);
     }
 
-    public Optional<Field> findById(final UUID id) {
-        return repository.findById(id);
-    }
-
-    public List<Field> findAll() {
-        return repository.findAll();
-    }
-
     public Field updateField(final UUID id, final String nameEn, final String nameSk, final String description) {
         Objects.requireNonNull(id, "Field ID is required for update");
 
