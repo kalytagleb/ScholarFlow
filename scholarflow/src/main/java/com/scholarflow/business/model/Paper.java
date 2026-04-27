@@ -101,10 +101,10 @@ public final class Paper {
     }
 
     private String validateTitle(final String text) {
-        if (title == null || !TITLE_REGEX.matcher(text).matches()) {
+        if (text == null || !TITLE_REGEX.matcher(text).matches()) {
             throw new IllegalArgumentException("Title must be between 5 and 300 characters.");
         }
-        return title;
+        return text;
     }
 
     private Optional<String> validateKeywords(final String kw) {
