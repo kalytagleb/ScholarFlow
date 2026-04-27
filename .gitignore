@@ -1,6 +1,6 @@
 target/
 .idea/
-src/main/resources/config/database.properties
+scholarflow/src/main/resources/config/database.properties
 logs/
 *.log
 .vscode/settings.json
