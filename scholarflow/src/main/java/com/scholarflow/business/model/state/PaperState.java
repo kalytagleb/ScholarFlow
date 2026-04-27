@@ -1,7 +1,7 @@
 package com.scholarflow.business.model.state;
 
 import com.scholarflow.business.model.Paper;
-import com.scholarflow.business.model.PaperStatus;
+import com.scholarflow.business.model.enums.PaperStatus;
 
 /**
  * Interface, which describes paper behavior in some state.

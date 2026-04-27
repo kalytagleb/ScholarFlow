@@ -4,10 +4,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 import com.scholarflow.business.model.Paper;
-import com.scholarflow.business.model.PaperStatus;
 import com.scholarflow.business.model.PaperVersion;
 import com.scholarflow.business.model.StatusChange;
 import com.scholarflow.business.model.User;
+import com.scholarflow.business.model.enums.PaperStatus;
 import com.scholarflow.data.repository.PaperRepository;
 import com.scholarflow.data.repository.PaperVersionRepository;
 import com.scholarflow.data.repository.StatusHistoryRepository;

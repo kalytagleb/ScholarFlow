@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import com.scholarflow.business.model.enums.PaperStatus;
 import com.scholarflow.business.model.state.AcceptedState;
 import com.scholarflow.business.model.state.DraftState;
 import com.scholarflow.business.model.state.ExceptState;

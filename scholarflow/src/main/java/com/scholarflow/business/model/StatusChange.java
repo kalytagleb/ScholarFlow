@@ -5,6 +5,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.scholarflow.business.model.enums.PaperStatus;
+
 public final class StatusChange {
     private final Optional<UUID> id;
     private final UUID paperId;

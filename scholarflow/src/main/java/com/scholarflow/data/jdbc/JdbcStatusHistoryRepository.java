@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.scholarflow.business.model.PaperStatus;
 import com.scholarflow.business.model.StatusChange;
+import com.scholarflow.business.model.enums.PaperStatus;
 import com.scholarflow.data.connection.DatabaseConnectionPool;
 import com.scholarflow.data.exception.RepositoryException;
 import com.scholarflow.data.repository.StatusHistoryRepository;

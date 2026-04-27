@@ -3,7 +3,7 @@ package com.scholarflow.business.model.state;
 import java.util.Objects;
 
 import com.scholarflow.business.model.Paper;
-import com.scholarflow.business.model.PaperStatus;
+import com.scholarflow.business.model.enums.PaperStatus;
 
 public final class SubmittedState implements PaperState {
     private final Paper paper;

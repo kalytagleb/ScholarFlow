@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.scholarflow.business.model.Paper;
-import com.scholarflow.business.model.PaperStatus;
+import com.scholarflow.business.model.enums.PaperStatus;
 
 public interface PaperRepository {
     Optional<Paper> findById(UUID id);

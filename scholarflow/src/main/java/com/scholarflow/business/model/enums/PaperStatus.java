@@ -1,4 +1,4 @@
-package com.scholarflow.business.model;
+package com.scholarflow.business.model.enums;
 
 public enum PaperStatus {
     DRAFT,
