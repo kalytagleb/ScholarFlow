@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import com.scholarflow.business.model.state.ExceptState;
 import com.scholarflow.business.model.state.PaperState;
 
 public final class Paper {
@@ -81,6 +82,7 @@ public final class Paper {
             case MINOR_REVISION -> new MinorRevisionState(this);
             case MAJOR_REVISION -> new MajorRevisionState(this);
             case RESUBMITTED -> new ResubmittedState(this);
+            default -> new ExceptState(status);
         };
     }
 

@@ -1,5 +1,6 @@
 package com.scholarflow.business.model.state;
 
+import com.scholarflow.business.model.Paper;
 import com.scholarflow.business.model.PaperStatus;
 
 /**
@@ -8,4 +9,10 @@ import com.scholarflow.business.model.PaperStatus;
  */
 public interface PaperState {
     PaperStatus status();
+    Paper submit();
+    Paper startReview();
+    Paper accept();
+    Paper reject();
+    Paper requestRevision(boolean major);
+    Paper resubmit();
 }
