@@ -6,8 +6,16 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import com.scholarflow.business.model.state.AcceptedState;
+import com.scholarflow.business.model.state.DraftState;
 import com.scholarflow.business.model.state.ExceptState;
+import com.scholarflow.business.model.state.MajorRevisionState;
+import com.scholarflow.business.model.state.MinorRevisionState;
 import com.scholarflow.business.model.state.PaperState;
+import com.scholarflow.business.model.state.RejectedState;
+import com.scholarflow.business.model.state.ResubmittedState;
+import com.scholarflow.business.model.state.SubmittedState;
+import com.scholarflow.business.model.state.UnderReviewState;
 
 public final class Paper {
     private static final Pattern TITLE_REGEX = 
