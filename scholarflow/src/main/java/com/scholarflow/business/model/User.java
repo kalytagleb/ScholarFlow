@@ -134,6 +134,14 @@ public final class User {
         return "REVIEWER".equals(this.role) || "ADMIN".equals(this.role);
     }
 
+    public boolean canRead() {
+        return "READER".equals(this.role);
+    }
+
+    public boolean canInteract() {
+        return this.active;
+    }
+
     @Override
     public String toString() {
         return String.format("User{id=%s, username='%s', role='%s'}",
