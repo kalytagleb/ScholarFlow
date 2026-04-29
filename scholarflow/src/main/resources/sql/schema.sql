@@ -18,7 +18,7 @@ CREATE TABLE users (
     is_active     BOOLEAN DEFAULT true,
     created_at    TIMESTAMP DEFAULT NOW(),
 
-    CONSTRAINT chk_role CHECK (role IN ('ADMIN', 'RESEARCHER', 'REVIEWER'))
+    CONSTRAINT chk_role CHECK (role IN ('ADMIN', 'RESEARCHER', 'REVIEWER', 'READER'))
 );
 
 CREATE TABLE papers (
@@ -95,6 +95,21 @@ CREATE TABLE status_history (
     changed_by UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
     comment    TEXT,
     changed_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE paper_comments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    paper_id UUID NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE paper_likes (
+    paper_id UUID NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (paper_id, user_id)
 );
 
 CREATE TABLE audit_log (
