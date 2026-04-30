@@ -49,8 +49,10 @@ public final class ReviewService {
             throw new IllegalArgumentException("The author cannot be a reviewer of their own paper.");
         }
 
-        if (paper.status() == PaperStatus.DRAFT) {
-            throw new IllegalArgumentException("Cannot assign reviewers to a draft paper.");
+        if (paper.status() != PaperStatus.SUBMITTED && paper.status() != PaperStatus.UNDER_REVIEW) {
+            throw new IllegalArgumentException(
+                "Reviewers can only be assigned to papers with SUBMITTED or UNDER_REVIEW status."
+            );
         }
 
         final ReviewAssignment newAssignment = new ReviewAssignment(
@@ -91,7 +93,7 @@ public final class ReviewService {
         return this.assignments.findByReviewer(reviewerId);
     }
 
-    public boolean isPendingFinished(final UUID paperId) {
+    public boolean areAllReviewsComplete(final UUID paperId) {
         final List<ReviewAssignment> paperAssignments = this.assignments.findByPaper(paperId);
 
         if (paperAssignments.isEmpty()) {

@@ -142,6 +142,14 @@ public final class Paper {
         return this.state.reject();
     }
 
+    public Paper requestRevision(final boolean major) {
+        return this.state.requestRevision(major);
+    }
+
+    public Paper resubmit() {
+        return this.state.resubmit();
+    }
+
     public Optional<UUID> id() { return id; }
     public String title() { return title; }
     public String paperAbstract() { return paperAbstract; }
@@ -152,4 +160,22 @@ public final class Paper {
     public PaperStatus status() { return state.status(); }
     public Optional<LocalDateTime> createdAt() { return createdAt; }
     public Optional<LocalDateTime> updatedAt() { return updatedAt; }
+
+    @Override
+    public String toString() {
+        return String.format("Paper{id=%s, title='%s', status=%s}",
+            id.map(UUID::toString).orElse("NEW"), title, state.status());
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Paper other)) return false;
+        return id.isPresent() && other.id.isPresent() && id.get().equals(other.id.get());
+    }
+
+    @Override
+    public int hashCode() {
+        return id.map(UUID::hashCode).orElse(0);
+    }
 }

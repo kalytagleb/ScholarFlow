@@ -71,7 +71,10 @@ public final class PaperVersion {
 
     public int wordCount() {
         return this.content
-            .map(text -> text.trim().split("\\s+").length)
+            .map(text -> {
+                final String trimmed = text.trim();
+                return trimmed.isEmpty() ? 0 : trimmed.split("\\s+").length;
+            })
             .orElse(0);
     }
 

@@ -90,7 +90,19 @@ public final class ReviewAssignment {
 
     @Override
     public String toString() {
-        return String.format("Assignment{paper=%s, reviewer=%s, status=%s, deadline=%s}", 
+        return String.format("Assignment{paper=%s, reviewer=%s, status=%s, deadline=%s}",
             paperId, reviewerId, status, deadline);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ReviewAssignment other)) return false;
+        return id.isPresent() && other.id.isPresent() && id.get().equals(other.id.get());
+    }
+
+    @Override
+    public int hashCode() {
+        return id.map(UUID::hashCode).orElse(0);
     }
 }

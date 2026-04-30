@@ -31,7 +31,7 @@ public final class PaperService {
         final String title,
         final String paperAbstract,
         final String keywords,
-        final UUID fiedldId,
+        final UUID fieldId,
         final User author
     ) {
         // Check permissions
@@ -41,7 +41,7 @@ public final class PaperService {
 
         // Create and save paper
         final Paper newPaper = this.paperRepo.save(
-            new Paper(title, paperAbstract, keywords, fiedldId, author.id().orElseThrow())
+            new Paper(title, paperAbstract, keywords, fieldId, author.id().orElseThrow())
         );
 
         final UUID paperId = newPaper.id().orElseThrow();
@@ -85,6 +85,10 @@ public final class PaperService {
         final Paper current = this.paperRepo.findById(paperId)
             .orElseThrow(() -> new IllegalArgumentException("Paper not found"));
 
+        if (!current.submitterId().equals(user.id().orElse(null)) && !user.hasAdminPrivileges()) {
+            throw new IllegalArgumentException("Only the author or admin can submit a paper");
+        }
+
         // Try to change status over state-machine in Paper
         final Paper submitted = current.submit();
 
@@ -102,5 +106,51 @@ public final class PaperService {
         );
 
         return submitted;
+    }
+
+    public Paper requestRevision(final UUID paperId, final boolean major, final User admin) {
+        if (!admin.hasAdminPrivileges()) {
+            throw new IllegalArgumentException("Only admin can request revision");
+        }
+
+        final Paper current = this.paperRepo.findById(paperId)
+            .orElseThrow(() -> new IllegalArgumentException("Paper not found"));
+
+        final Paper revised = current.requestRevision(major);
+
+        this.paperRepo.update(revised);
+
+        this.historyRepo.save(new StatusChange(
+            paperId,
+            current.status(),
+            revised.status(),
+            admin.id().orElseThrow(),
+            major ? "Major revision requested" : "Minor revision requested"
+        ));
+
+        return revised;
+    }
+
+    public Paper resubmitPaper(final UUID paperId, final User user) {
+        final Paper current = this.paperRepo.findById(paperId)
+            .orElseThrow(() -> new IllegalArgumentException("Paper not found"));
+
+        if (!current.submitterId().equals(user.id().orElse(null)) && !user.hasAdminPrivileges()) {
+            throw new IllegalArgumentException("Only the author or admin can resubmit a paper");
+        }
+
+        final Paper resubmitted = current.resubmit();
+
+        this.paperRepo.update(resubmitted);
+
+        this.historyRepo.save(new StatusChange(
+            paperId,
+            current.status(),
+            resubmitted.status(),
+            user.id().orElseThrow(),
+            "Paper resubmitted after revision"
+        ));
+
+        return resubmitted;
     }
 }

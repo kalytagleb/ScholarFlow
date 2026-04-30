@@ -69,4 +69,16 @@ public final class Review {
     public String toString() {
         return String.format("Review{assignment=%s, decision=%s}", assignmentId, decision);
     }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Review other)) return false;
+        return id.isPresent() && other.id.isPresent() && id.get().equals(other.id.get());
+    }
+
+    @Override
+    public int hashCode() {
+        return id.map(UUID::hashCode).orElse(0);
+    }
 }

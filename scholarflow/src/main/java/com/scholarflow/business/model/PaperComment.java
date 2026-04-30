@@ -37,7 +37,7 @@ public final class PaperComment {
     }
 
     private String validateContent(final String text) {
-        final String trimmed = Objects.requireNonNull(text, "Coment cannot be null").trim();
+        final String trimmed = Objects.requireNonNull(text, "Comment cannot be null").trim();
 
         if (trimmed.isEmpty()) {
             throw new IllegalArgumentException("Comment cannot be empty.");

@@ -95,7 +95,7 @@ public final class JdbcReviewAssignmentRepository implements ReviewAssignmentRep
             stmt.setObject(2, id);
             stmt.executeUpdate();
         } catch (SQLException ex) {
-            throw new RepositoryException("Error updating assignemt status", ex);
+            throw new RepositoryException("Error updating assignment status", ex);
         }
     }
 
@@ -109,7 +109,7 @@ public final class JdbcReviewAssignmentRepository implements ReviewAssignmentRep
             stmt.setObject(1, id);
             stmt.executeUpdate();
         } catch (SQLException ex) {
-            throw new RepositoryException("Error deleting assignemt", ex);
+            throw new RepositoryException("Error deleting assignment", ex);
         }
     }
 

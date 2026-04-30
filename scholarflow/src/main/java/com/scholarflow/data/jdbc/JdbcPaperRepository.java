@@ -39,7 +39,7 @@ public final class JdbcPaperRepository implements PaperRepository {
                 return Optional.empty();
             }
         } catch (SQLException ex) {
-            throw new RepositoryException("Error finding paper by id: " + id);
+            throw new RepositoryException("Error finding paper by id: " + id, ex);
         }
     }
 

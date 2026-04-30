@@ -135,7 +135,7 @@ public final class User {
     }
 
     public boolean canRead() {
-        return "READER".equals(this.role);
+        return "READER".equals(this.role) || "ADMIN".equals(this.role);
     }
 
     public boolean canInteract() {

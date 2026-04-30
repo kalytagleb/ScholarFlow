@@ -58,7 +58,7 @@ public final class JdbcPaperAuthorRepository implements PaperAuthorRepository {
 
             return results;
         } catch (SQLException ex) {
-            throw new RepositoryException("Error saving paper author", ex);
+            throw new RepositoryException("Error fetching authors for paper: " + paperId, ex);
         }
     }
 
@@ -80,7 +80,7 @@ public final class JdbcPaperAuthorRepository implements PaperAuthorRepository {
 
             return results;
         } catch (SQLException ex) {
-            throw new RepositoryException("Error saving paper author", ex);
+            throw new RepositoryException("Error fetching papers for user: " + userId, ex);
         }
     }
 
@@ -96,7 +96,9 @@ public final class JdbcPaperAuthorRepository implements PaperAuthorRepository {
 
             stmt.executeUpdate();
         } catch (SQLException ex) {
-            throw new RepositoryException("Error saving paper author", ex);
+            throw new RepositoryException(
+                String.format("Error removing author %s from paper %s", userId, paperId), ex
+            );
         }
     }
 
@@ -110,7 +112,7 @@ public final class JdbcPaperAuthorRepository implements PaperAuthorRepository {
             stmt.setObject(1, paperId);
             stmt.executeUpdate();
         } catch (SQLException ex) {
-            throw new RepositoryException("Error saving paper author", ex);
+            throw new RepositoryException("Error removing all authors for paper: " + paperId, ex);
         }
     }
 

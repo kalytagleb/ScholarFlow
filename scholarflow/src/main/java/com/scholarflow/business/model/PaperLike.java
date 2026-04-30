@@ -37,6 +37,11 @@ public final class PaperLike {
     }
 
     @Override
+    public String toString() {
+        return String.format("PaperLike{paper=%s, user=%s}", paperId, userId);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof PaperLike other)) return false;
