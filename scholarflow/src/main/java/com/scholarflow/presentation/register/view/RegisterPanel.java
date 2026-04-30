@@ -75,13 +75,15 @@ public final class RegisterPanel extends JPanel {
         addField(card, "Email", emailField);
         addField(card, "Full Name", fullNameField);
         addField(card, "Password", passwordField);
+        addField(card, "I am a: ", roleCombo);
+        addField(card, "Scientific Field: ", fieldCombo);
 
-        card.add(new JLabel("I am a:"));
-        card.add(roleCombo);
-        card.add(Box.createRigidArea(new Dimension(0, 15)));
+        // card.add(new JLabel("I am a:"));
+        // card.add(roleCombo);
+        // card.add(Box.createRigidArea(new Dimension(0, 15)));
 
-        card.add(new JLabel("Scientific Field:"));
-        card.add(fieldCombo);
+        // card.add(new JLabel("Scientific Field:"));
+        // card.add(fieldCombo);
 
         card.add(Box.createRigidArea(new Dimension(0, 10)));
         card.add(errorLabel);

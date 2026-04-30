@@ -8,8 +8,10 @@ import javax.swing.SwingWorker;
 
 import com.scholarflow.business.model.User;
 import com.scholarflow.business.service.FieldService;
+import com.scholarflow.business.service.Translator;
 import com.scholarflow.business.service.UserService;
 import com.scholarflow.presentation.login.view.LoginPanel;
+import com.scholarflow.presentation.main.view.DashboardFrame;
 import com.scholarflow.presentation.register.view.RegisterFrame;
 
 public final class LoginController {
@@ -17,12 +19,14 @@ public final class LoginController {
     private final LoginPanel view;
     private final JFrame frame;
     private final FieldService fieldService;
+    private final Translator translator;
 
-    public LoginController(UserService userService, FieldService fieldService, LoginPanel view, JFrame frame) {
+    public LoginController(UserService userService, FieldService fieldService, LoginPanel view, JFrame frame, Translator translator) {
         this.userService = userService;
         this.fieldService = fieldService;
         this.view = view;
         this.frame = frame;
+        this.translator = translator;
         this.init();
     }
 
@@ -56,7 +60,12 @@ public final class LoginController {
                     Optional<User> user = get();
                     if (user.isPresent()) {
                         frame.dispose();
-                        JOptionPane.showMessageDialog(null, "Welcome, " + user.get().fullName());
+                        // JOptionPane.showMessageDialog(null, "Welcome, " + user.get().fullName());
+
+                        User loggedUser = user.get();
+                        new DashboardFrame(loggedUser, translator).open();
+
+                        System.out.println("User " + loggedUser.username() + " opened dashboard.");
                     } else {
                         view.setLock(false);
                         view.displayError("Invalid username or password");

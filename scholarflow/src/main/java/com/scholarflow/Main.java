@@ -2,7 +2,9 @@ package com.scholarflow;
 
 import javax.swing.SwingUtilities;
 
+import com.scholarflow.business.model.User;
 import com.scholarflow.business.service.FieldService;
+import com.scholarflow.business.service.Translator;
 import com.scholarflow.business.service.UserService;
 import com.scholarflow.data.connection.DatabaseConfig;
 import com.scholarflow.data.connection.DatabaseConnectionPool;
@@ -20,8 +22,10 @@ public final class Main {
             UserService userService = new UserService(new JdbcUserRepository(pool));
             FieldService fieldService = new FieldService(new JdbcFieldRepository(pool));
 
+            Translator translator = new Translator("en");
+
             SwingUtilities.invokeLater(() -> {
-                new LoginFrame(userService, fieldService).open();
+                new LoginFrame(userService, fieldService, translator).open();
             });
         } catch (Exception e) {
             System.err.println("Failed to start application: " + e.getMessage());
