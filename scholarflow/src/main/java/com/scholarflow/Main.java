@@ -6,7 +6,7 @@ import com.scholarflow.business.service.UserService;
 import com.scholarflow.data.connection.DatabaseConfig;
 import com.scholarflow.data.connection.DatabaseConnectionPool;
 import com.scholarflow.data.jdbc.JdbcUserRepository;
-import com.scholarflow.presentation.login.LoginFrame;
+import com.scholarflow.presentation.login.view.LoginFrame;
 
 public final class Main {
     public static void main(String[] args) {

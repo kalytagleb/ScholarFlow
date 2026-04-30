@@ -1,4 +1,4 @@
-package com.scholarflow.presentation.components;
+package com.scholarflow.presentation.common;
 
 import java.awt.Color;
 import java.awt.Component;

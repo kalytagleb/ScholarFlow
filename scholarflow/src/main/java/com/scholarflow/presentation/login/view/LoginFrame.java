@@ -1,8 +1,9 @@
-package com.scholarflow.presentation.login;
+package com.scholarflow.presentation.login.view;
 
 import javax.swing.JFrame;
 
 import com.scholarflow.business.service.UserService;
+import com.scholarflow.presentation.login.controller.LoginController;
 
 public final class LoginFrame {
     private final JFrame frame;

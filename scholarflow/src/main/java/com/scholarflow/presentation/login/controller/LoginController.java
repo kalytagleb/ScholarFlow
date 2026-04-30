@@ -1,4 +1,4 @@
-package com.scholarflow.presentation.login;
+package com.scholarflow.presentation.login.controller;
 
 import java.util.Optional;
 
@@ -8,6 +8,7 @@ import javax.swing.SwingWorker;
 
 import com.scholarflow.business.model.User;
 import com.scholarflow.business.service.UserService;
+import com.scholarflow.presentation.login.view.LoginPanel;
 
 public final class LoginController {
     private final UserService userService;
