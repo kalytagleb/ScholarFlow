@@ -7,16 +7,20 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import com.scholarflow.business.model.User;
+import com.scholarflow.business.service.FieldService;
 import com.scholarflow.business.service.UserService;
 import com.scholarflow.presentation.login.view.LoginPanel;
+import com.scholarflow.presentation.register.view.RegisterFrame;
 
 public final class LoginController {
     private final UserService userService;
     private final LoginPanel view;
     private final JFrame frame;
+    private final FieldService fieldService;
 
-    public LoginController(UserService userService, LoginPanel view, JFrame frame) {
+    public LoginController(UserService userService, FieldService fieldService, LoginPanel view, JFrame frame) {
         this.userService = userService;
+        this.fieldService = fieldService;
         this.view = view;
         this.frame = frame;
         this.init();
@@ -24,6 +28,7 @@ public final class LoginController {
 
     private void init() {
         this.view.onLogin(this::handleLogin);
+        this.view.onRegisterNavigate(this::handleOpenRegister);
     }
 
     private void handleLogin() {
@@ -63,5 +68,9 @@ public final class LoginController {
                 }
             }
         }.execute();
+    }
+
+    private void handleOpenRegister() {
+        new RegisterFrame(userService, fieldService).open();
     }
 }

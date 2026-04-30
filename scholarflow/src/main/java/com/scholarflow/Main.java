@@ -2,9 +2,11 @@ package com.scholarflow;
 
 import javax.swing.SwingUtilities;
 
+import com.scholarflow.business.service.FieldService;
 import com.scholarflow.business.service.UserService;
 import com.scholarflow.data.connection.DatabaseConfig;
 import com.scholarflow.data.connection.DatabaseConnectionPool;
+import com.scholarflow.data.jdbc.JdbcFieldRepository;
 import com.scholarflow.data.jdbc.JdbcUserRepository;
 import com.scholarflow.presentation.login.view.LoginFrame;
 
@@ -15,11 +17,11 @@ public final class Main {
 
             DatabaseConnectionPool pool = new DatabaseConnectionPool(config);
 
-            JdbcUserRepository userRepository = new JdbcUserRepository(pool);
-            UserService userService = new UserService(userRepository);
+            UserService userService = new UserService(new JdbcUserRepository(pool));
+            FieldService fieldService = new FieldService(new JdbcFieldRepository(pool));
 
             SwingUtilities.invokeLater(() -> {
-                new LoginFrame(userService).open();
+                new LoginFrame(userService, fieldService).open();
             });
         } catch (Exception e) {
             System.err.println("Failed to start application: " + e.getMessage());

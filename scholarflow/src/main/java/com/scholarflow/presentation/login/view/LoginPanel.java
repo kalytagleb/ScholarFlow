@@ -2,6 +2,7 @@ package com.scholarflow.presentation.login.view;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -10,6 +11,7 @@ import java.awt.GridBagLayout;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -25,6 +27,7 @@ public final class LoginPanel extends JPanel {
     private final JPasswordField passwordField = new JPasswordField();
     private final PrimaryButton loginBtn = new PrimaryButton("Sign In");
     private final JLabel errorLabel = new JLabel(" ", SwingConstants.CENTER);
+    private final JButton registerLink = new JButton("Don't have an account? Register here");
 
     public LoginPanel() {
         this.setLayout(new GridBagLayout());
@@ -58,6 +61,13 @@ public final class LoginPanel extends JPanel {
         errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         errorLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
+        registerLink.setBorderPainted(false);
+        registerLink.setContentAreaFilled(false);
+        registerLink.setForeground(new Color(41, 128, 185));
+        registerLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        registerLink.setAlignmentX(Component.CENTER_ALIGNMENT);
+        registerLink.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+
         card.add(title);
         card.add(Box.createRigidArea(new Dimension(0, 40)));
         card.add(userLabel);
@@ -71,6 +81,8 @@ public final class LoginPanel extends JPanel {
         card.add(errorLabel);
         card.add(Box.createRigidArea(new Dimension(0, 20)));
         card.add(loginBtn);
+        card.add(Box.createRigidArea(new Dimension(0, 15)));
+        card.add(registerLink);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -106,6 +118,10 @@ public final class LoginPanel extends JPanel {
 
     public void onLogin(Runnable action) {
         loginBtn.addActionListener(e -> action.run());
+    }
+
+    public void onRegisterNavigate(Runnable action) {
+        registerLink.addActionListener(e -> action.run());
     }
 
     public void displayError(String msg) {
