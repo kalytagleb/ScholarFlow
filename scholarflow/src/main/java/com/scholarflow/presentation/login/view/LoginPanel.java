@@ -7,11 +7,14 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.Objects;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -19,32 +22,56 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import com.scholarflow.business.service.Translator;
 import com.scholarflow.presentation.common.PrimaryButton;
 
 public final class LoginPanel extends JPanel {
+    private final JLabel titleLabel = new JLabel("Scholarflow");
+    private final JLabel userLabel = new JLabel();
+    private final JLabel passLabel = new JLabel();
+
     // Create components
     private final JTextField usernameField = new JTextField();
     private final JPasswordField passwordField = new JPasswordField();
-    private final PrimaryButton loginBtn = new PrimaryButton("Sign In");
+    private final PrimaryButton loginBtn;
     private final JLabel errorLabel = new JLabel(" ", SwingConstants.CENTER);
-    private final JButton registerLink = new JButton("Don't have an account? Register here");
+    private final JButton registerLink;
 
-    public LoginPanel() {
+    // Language choice: EN or SK
+    private final JComboBox<String> langCombo = new JComboBox<>(new String[]{"English", "Slovenčina"});
+
+    public LoginPanel(final Translator translator) {
+        this.loginBtn = new PrimaryButton(translator.translate("login.signin"));
+        this.registerLink = new JButton(translator.translate("login.register_link"));
+
         this.setLayout(new GridBagLayout());
         this.setBackground(new Color(245, 246, 250));
         this.setupLayout();
+
+        this.updateTexts(translator);
+    }
+
+    public void updateTexts(Translator translator) {
+        titleLabel.setText(translator.translate("login.title"));
+        userLabel.setText(translator.translate("login.username"));
+        passLabel.setText(translator.translate("login.password"));
+        loginBtn.setText(translator.translate("login.signin"));
+        registerLink.setText(translator.translate("login.register_link"));
+
+        langCombo.setSelectedItem(translator.currentLanguage().equals("sk") ? "Slovenčina" : "English");
     }
 
     private void setupLayout() {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBackground(Color.WHITE);
-        card.setBorder(new EmptyBorder(40, 40, 40, 40));
-
         card.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(220, 221, 225), 1),
             new EmptyBorder(30, 30, 30, 30)
         ));
+
+        langCombo.setMaximumSize(new Dimension(120, 25));
+        langCombo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel title = new JLabel("Scholarflow");
         title.setFont(new Font("Segoe UI", Font.BOLD, 32));
@@ -54,50 +81,34 @@ public final class LoginPanel extends JPanel {
         this.styleInputField(usernameField);
         this.styleInputField(passwordField);
 
-        JLabel userLabel = createFieldLabel("Username");
-        JLabel passLabel = createFieldLabel("Password");
-
-        errorLabel.setForeground(new Color(231, 76, 60));
-        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        errorLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-
-        registerLink.setBorderPainted(false);
-        registerLink.setContentAreaFilled(false);
-        registerLink.setForeground(new Color(41, 128, 185));
-        registerLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        registerLink.setAlignmentX(Component.CENTER_ALIGNMENT);
-        registerLink.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-
+        card.add(langCombo);
+        card.add(Box.createRigidArea(new Dimension(0,20)));
         card.add(title);
-        card.add(Box.createRigidArea(new Dimension(0, 40)));
-        card.add(userLabel);
-        card.add(Box.createRigidArea(new Dimension(0, 5)));
-        card.add(usernameField);
-        card.add(Box.createRigidArea(new Dimension(0, 20)));
-        card.add(passLabel);
-        card.add(Box.createRigidArea(new Dimension(0, 5)));
-        card.add(passwordField);
-        card.add(Box.createRigidArea(new Dimension(0, 10)));
+        card.add(Box.createRigidArea(new Dimension(0,30)));
+
+        this.addLabeledField(card, userLabel, usernameField);
+        this.addLabeledField(card, passLabel, passwordField);
+
         card.add(errorLabel);
         card.add(Box.createRigidArea(new Dimension(0, 20)));
         card.add(loginBtn);
+
+        this.styleLinkButton(registerLink);
         card.add(Box.createRigidArea(new Dimension(0, 15)));
         card.add(registerLink);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.CENTER;
-
-        this.add(card, gbc);
+        this.add(card, new GridBagConstraints());
     }
 
-    private JLabel createFieldLabel(String text) {
-        JLabel label = new JLabel(text);
+    private void addLabeledField(JPanel panel, JLabel label, JComponent field) {
         label.setFont(new Font("Segoe UI", Font.BOLD, 12));
         label.setForeground(new Color(127, 140, 141));
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        return label;
+        
+        panel.add(label);
+        panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        panel.add(field);
+        panel.add(Box.createRigidArea(new Dimension(0, 15)));
     }
 
     private void styleInputField(JTextField field) {
@@ -112,9 +123,21 @@ public final class LoginPanel extends JPanel {
         ));
     }
 
+    private void styleLinkButton(JButton btn) {
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setForeground(new Color(41, 128, 185));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btn.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+    }
+
     // In order to controller had access to Panel
     public String username() { return usernameField.getText(); }
     public String password() { return new String(passwordField.getPassword()); }
+    public String selectedLanguage() {
+        return "Slovenčina".equals(langCombo.getSelectedItem()) ? "sk" : "en";
+    }
 
     public void onLogin(Runnable action) {
         loginBtn.addActionListener(e -> action.run());
@@ -122,6 +145,10 @@ public final class LoginPanel extends JPanel {
 
     public void onRegisterNavigate(Runnable action) {
         registerLink.addActionListener(e -> action.run());
+    }
+
+    public void onLanguageChange(Runnable action) {
+        langCombo.addActionListener(e -> action.run());
     }
 
     public void displayError(String msg) {

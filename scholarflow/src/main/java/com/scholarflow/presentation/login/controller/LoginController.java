@@ -33,6 +33,13 @@ public final class LoginController {
     private void init() {
         this.view.onLogin(this::handleLogin);
         this.view.onRegisterNavigate(this::handleOpenRegister);
+        this.view.onLanguageChange(this::handleLanguageChange);
+    }
+
+    private void handleLanguageChange() {
+        Translator newTranslator = new Translator(view.selectedLanguage());
+        view.updateTexts(newTranslator);
+        frame.setTitle("Scholarflow - " + newTranslator.translate("login.title"));
     }
 
     private void handleLogin() {
@@ -40,12 +47,11 @@ public final class LoginController {
         final String pass = view.password();
 
         if (name.isBlank() || pass.isBlank()) {
-            view.displayError("Username and password required");
+            view.displayError(translator.translate("error.empty_fields"));
             return;
         }
 
         view.setLock(true);
-        view.displayError("Authenticating...");
 
         // We create separate thread for DB and return result into UI thread
         new SwingWorker<Optional<User>, Void>() {
@@ -80,6 +86,6 @@ public final class LoginController {
     }
 
     private void handleOpenRegister() {
-        new RegisterFrame(userService, fieldService).open();
+        new RegisterFrame(userService, fieldService, translator, this.frame).open();
     }
 }

@@ -2,7 +2,6 @@ package com.scholarflow;
 
 import javax.swing.SwingUtilities;
 
-import com.scholarflow.business.model.User;
 import com.scholarflow.business.service.FieldService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.business.service.UserService;

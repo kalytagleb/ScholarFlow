@@ -21,26 +21,52 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import com.scholarflow.business.service.Translator;
 import com.scholarflow.presentation.common.PrimaryButton;
+import com.scholarflow.presentation.common.SecondaryButton;
+import com.scholarflow.presentation.common.StyleComboBox;
 
 public final class RegisterPanel extends JPanel {
+    private final JLabel titleLabel = new JLabel();
+    private final JLabel userLabel = new JLabel();
+    private final JLabel emailLabel = new JLabel();
+    private final JLabel nameLabel = new JLabel();
+    private final JLabel passLabel = new JLabel();
+    private final JLabel roleChoiceLabel = new JLabel();
+    private final JLabel fieldChoiceLabel = new JLabel();
+    private final JLabel errorLabel = new JLabel(" ", SwingConstants.CENTER);
+
     private final JTextField usernameField = new JTextField();
     private final JTextField emailField = new JTextField();
     private final JTextField fullNameField = new JTextField();
     private final JPasswordField passwordField = new JPasswordField();
 
     // Choose role: READER or RESEARCHER
-    private final JComboBox<String> roleCombo = new JComboBox<>(new String[]{"READER", "RESEARCHER"});
+    private final StyleComboBox<String> roleCombo = new StyleComboBox<>(new String[]{"READER", "RESEARCHER"});
     // Choose scientific field (filled from DB)
-    private final JComboBox<String> fieldCombo = new JComboBox<>();
+    private final StyleComboBox<String> fieldCombo = new StyleComboBox<>(new String[0]);
 
-    private final PrimaryButton registerBtn = new PrimaryButton("Create Account");
-    private final JLabel errorLabel = new JLabel(" ", SwingConstants.CENTER);
+    private final SecondaryButton backBtn = new SecondaryButton("");
+    private final PrimaryButton registerBtn = new PrimaryButton("");
 
-    public RegisterPanel() {
+    public RegisterPanel(final Translator translator) {
         this.setLayout(new GridBagLayout());
         this.setBackground(new Color(245, 246, 250));
         this.setupLayout();
+        this.updateTexts(translator);
+    }
+
+    public void updateTexts(Translator translator) {
+        titleLabel.setText(translator.translate("register.title"));
+        userLabel.setText(translator.translate("register.username"));
+        emailLabel.setText(translator.translate("register.email"));
+        nameLabel.setText(translator.translate("register.fullname"));
+        passLabel.setText(translator.translate("register.password"));
+        roleChoiceLabel.setText(translator.translate("register.role"));
+        fieldChoiceLabel.setText(translator.translate("register.field"));
+        
+        registerBtn.setText(translator.translate("register.button"));
+        backBtn.setText("<- " + translator.translate("login.back_to_login"));
     }
 
     private void setupLayout() {
@@ -53,66 +79,54 @@ public final class RegisterPanel extends JPanel {
             new EmptyBorder(30, 40, 30, 40)
         ));
 
-        JLabel title = new JLabel("Join Scholarflow");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 32));
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        styleField(usernameField);
-        styleField(emailField);
-        styleField(fullNameField);
-        styleField(passwordField);
-
-        roleCombo.setMaximumSize(new Dimension(280, 35));
-        fieldCombo.setMaximumSize(new Dimension(280, 35));
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 26));
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         errorLabel.setForeground(new Color(231, 76, 60));
         errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        card.add(title);
-        card.add(Box.createRigidArea(new Dimension(0, 30)));
+        card.add(titleLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        addField(card, "Username", usernameField);
-        addField(card, "Email", emailField);
-        addField(card, "Full Name", fullNameField);
-        addField(card, "Password", passwordField);
-        addField(card, "I am a: ", roleCombo);
-        addField(card, "Scientific Field: ", fieldCombo);
+        this.addLabeledField(card, userLabel, usernameField);
+        this.addLabeledField(card, emailLabel, emailField);
+        this.addLabeledField(card, nameLabel, fullNameField);
+        this.addLabeledField(card, passLabel, passwordField);
+        
+        this.addLabeledField(card, roleChoiceLabel, roleCombo);
+        this.addLabeledField(card, fieldChoiceLabel, fieldCombo);
 
-        // card.add(new JLabel("I am a:"));
-        // card.add(roleCombo);
-        // card.add(Box.createRigidArea(new Dimension(0, 15)));
-
-        // card.add(new JLabel("Scientific Field:"));
-        // card.add(fieldCombo);
+        card.add(errorLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 10)));
+        card.add(registerBtn);
 
         card.add(Box.createRigidArea(new Dimension(0, 10)));
-        card.add(errorLabel);
-        card.add(Box.createRigidArea(new Dimension(0, 20)));
-        card.add(registerBtn);
+        card.add(backBtn);
+        
+        // card.add(new JLabel("Scientific Field:"));
+        // card.add(fieldCombo);
 
         this.add(card, new GridBagConstraints());
     }
 
     // To add title above field
-    private void addField(JPanel panel, String labelText, JComponent field) {
-        JLabel label = new JLabel(labelText);
-        label.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        label.setForeground(new Color(127, 140, 141));
+    private void addLabeledField(JPanel panel, JLabel label, JComponent field) {
+        label.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        label.setForeground(new Color(149, 165, 166));
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
-        panel.add(label);
-        panel.add(Box.createRigidArea(new Dimension(0, 5)));
-        panel.add(field);
-        panel.add(Box.createRigidArea(new Dimension(0, 15)));
-    }
 
-    private void styleField(JTextField field) {
-        field.setMaximumSize(new Dimension(280, 35));
-        field.setPreferredSize(new Dimension(280, 35));
-        field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(189, 195, 199), 1),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
-        ));
+        if (field instanceof JTextField) {
+            field.setMaximumSize(new Dimension(280, 32));
+            field.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(220, 221, 225), 1),
+                BorderFactory.createEmptyBorder(2, 8, 2, 8)
+            ));
+        }
+
+        panel.add(label);
+        panel.add(Box.createRigidArea(new Dimension(0, 3)));
+        panel.add(field);
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
     }
 
     // Methods for controller
@@ -136,6 +150,10 @@ public final class RegisterPanel extends JPanel {
 
     public void onRegister(Runnable action) {
         registerBtn.addActionListener(e -> action.run());
+    }
+
+    public void onBack(Runnable action) {
+        backBtn.addActionListener(e -> action.run());
     }
 
     public void displayError(String msg) {
