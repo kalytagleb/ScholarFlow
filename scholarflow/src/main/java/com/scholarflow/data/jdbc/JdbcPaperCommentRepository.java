@@ -25,9 +25,9 @@ public final class JdbcPaperCommentRepository implements PaperCommentRepository 
     @Override
     public void save(final PaperComment comment) {
         final String sql = """
-                INSERT INTO paper_comments (paper_id, user_id, content)
-                VALUES (?, ?, ?)
-                """;
+            INSERT INTO paper_comments (paper_id, user_id, content)
+            VALUES (?, ?, ?)
+            """;
 
         try (Connection conn = pool.connection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -38,6 +38,7 @@ public final class JdbcPaperCommentRepository implements PaperCommentRepository 
 
             stmt.executeUpdate();
         } catch (SQLException ex) {
+            ex.printStackTrace();
             throw new RepositoryException("Error saving comment for paper", ex);
         }
     }

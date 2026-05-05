@@ -2,6 +2,7 @@ package com.scholarflow.presentation.main.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -31,6 +32,8 @@ public final class PaperDetailsFrame {
     private final Translator translator;
     private final User currentUser;
     private final InteractionService interactionService;
+    private JButton likeBtn;
+    private JLabel likeCountLabel;
 
     public PaperDetailsFrame(
         final Paper paper, 
@@ -70,13 +73,32 @@ public final class PaperDetailsFrame {
         title.setFont(new Font("Segoe UI", Font.BOLD, 24));
         title.setForeground(new Color(44, 62, 80));
 
-        StatusBadge badge = new StatusBadge(
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
+        actions.setBackground(Color.WHITE);
+
+        likeBtn = new JButton("❤️");
+        likeBtn.setFont(new Font("Segoe UI", Font.PLAIN, 20));
+        likeBtn.setContentAreaFilled(false);
+        likeBtn.setBorderPainted(false);
+        likeBtn.setFocusPainted(false);
+        likeBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        likeCountLabel = new JLabel("0");
+        likeCountLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        likeCountLabel.setForeground(new Color(127, 140, 141));
+
+        StatusBadge statusBadge = new StatusBadge(
             paper.status(),
             translator.translate("status." + paper.status().name().toLowerCase())
         );
 
+        actions.add(likeCountLabel);
+        actions.add(likeBtn);
+        actions.add(statusBadge);
+
         panel.add(title, BorderLayout.CENTER);
-        panel.add(badge, BorderLayout.EAST);
+        panel.add(actions, BorderLayout.EAST);
+
         return panel;
     }
 
@@ -108,7 +130,8 @@ public final class PaperDetailsFrame {
             translator,
             currentUser,
             paper.id().orElseThrow(),
-            commentsView
+            commentsView,
+            this
         );
 
         panel.add(commentsView);
@@ -125,6 +148,14 @@ public final class PaperDetailsFrame {
 
         panel.add(closeButton);
         return panel;
+    }
+
+    public void onLikeClick(Runnable action) {
+        likeBtn.addActionListener(e -> action.run());
+    }
+
+    public void updateLikeUI(long count, boolean isLiked) {
+        likeCountLabel.setText(String.valueOf(count));
     }
 
     public void open() {

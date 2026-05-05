@@ -77,4 +77,8 @@ public final class InteractionService {
     public long getLikeCount(final UUID paperId) {
         return this.likes.countByPaper(paperId);
     }
+
+    public boolean hasUserLiked(final UUID paperId, final UUID userId) {
+        return this.likes.exists(paperId, userId);
+    }
 }
