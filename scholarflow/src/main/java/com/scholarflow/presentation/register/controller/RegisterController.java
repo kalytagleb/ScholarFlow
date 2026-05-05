@@ -12,6 +12,7 @@ import javax.swing.SwingWorker;
 import com.scholarflow.business.model.Field;
 import com.scholarflow.business.model.User;
 import com.scholarflow.business.service.FieldService;
+import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.PaperService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.business.service.UserService;
@@ -24,6 +25,7 @@ public final class RegisterController {
     private final Translator translator;
     private final RegisterPanel view;
     private final PaperService paperService;
+    private final InteractionService interactionService;
 
     private final JFrame registerFrame;
     private final JFrame loginFrame;
@@ -34,6 +36,7 @@ public final class RegisterController {
         UserService userService,
         FieldService fieldService,
         PaperService paperService,
+        InteractionService interactionService,
         Translator translator,
         RegisterPanel view,
         JFrame registerFrame,
@@ -42,6 +45,7 @@ public final class RegisterController {
         this.userService = Objects.requireNonNull(userService);
         this.fieldService = Objects.requireNonNull(fieldService);
         this.paperService = Objects.requireNonNull(paperService);
+        this.interactionService = Objects.requireNonNull(interactionService);
         this.translator = Objects.requireNonNull(translator);
         this.view = Objects.requireNonNull(view);
         this.registerFrame = Objects.requireNonNull(registerFrame);
@@ -123,7 +127,7 @@ public final class RegisterController {
                     registerFrame.dispose();
                     loginFrame.dispose();
                     
-                    new DashboardFrame(newUser, translator, paperService, fieldService).open();
+                    new DashboardFrame(newUser, translator, paperService, fieldService, interactionService).open();
 
                     JOptionPane.showMessageDialog(null, translator.translate("register.success_welcome") + " " + newUser.fullName());
                 } catch (Exception e) {

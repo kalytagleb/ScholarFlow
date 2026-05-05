@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 
 import com.scholarflow.business.model.User;
 import com.scholarflow.business.service.FieldService;
+import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.PaperService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.presentation.main.controller.DashboardController;
@@ -19,7 +20,13 @@ public final class DashboardFrame {
     private final JFrame frame;
     private final JPanel contentContainer;
     
-    public DashboardFrame(final User user, final Translator translator, final PaperService paperService, final FieldService fieldService) {
+    public DashboardFrame(
+        final User user, 
+        final Translator translator,
+        final PaperService paperService, 
+        final FieldService fieldService,
+        final InteractionService interactionService
+    ) {
         Objects.requireNonNull(user);
         Objects.requireNonNull(translator);
 
@@ -42,6 +49,7 @@ public final class DashboardFrame {
             translator, 
             paperService,
             fieldService,
+            interactionService,
             sidebar, 
             contentContainer, 
             frame

@@ -19,17 +19,29 @@ import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
 import com.scholarflow.business.model.Paper;
+import com.scholarflow.business.model.User;
+import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.presentation.common.StatusBadge;
+import com.scholarflow.presentation.main.controller.InteractionController;
 
 public final class PaperDetailsFrame {
     private final JFrame frame;
     private final Paper paper;
     private final Translator translator;
+    private final User currentUser;
+    private final InteractionService interactionService;
 
-    public PaperDetailsFrame(final Paper paper, final Translator translator) {
+    public PaperDetailsFrame(
+        final Paper paper, 
+        final User currentUser,
+        final Translator translator,
+        final InteractionService interactionService
+    ) {
         this.paper = Objects.requireNonNull(paper);
+        this.currentUser = Objects.requireNonNull(currentUser);
         this.translator = Objects.requireNonNull(translator);
+        this.interactionService = Objects.requireNonNull(interactionService);
         this.frame = new JFrame(translator.translate("details.title"));
         this.setupUI();
     }
@@ -73,14 +85,6 @@ public final class PaperDetailsFrame {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(Color.WHITE);
 
-        if (paper.doi().isPresent()) {
-            JLabel doiLabel = new JLabel("DOI: " + paper.doi().get());
-            doiLabel.setFont(new Font("Segoe UI", Font.ITALIC, 13));
-            doiLabel.setForeground(new Color(52, 152, 219));
-            panel.add(doiLabel);
-            panel.add(Box.createRigidArea(new Dimension(0, 15)));
-        }
-
         JLabel absHeader = new JLabel(translator.translate("details.abstract"));
         absHeader.setFont(new Font("Segoe UI", Font.ITALIC, 13));
         panel.add(absHeader);
@@ -92,11 +96,22 @@ public final class PaperDetailsFrame {
         area.setWrapStyleWord(true);
         area.setEditable(false);
         area.setBackground(new Color(248, 249, 250));
-        area.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         JScrollPane scroll = new JScrollPane(area);
-        scroll.setBorder(BorderFactory.createLineBorder(new Color(236, 240, 241)));
+        scroll.setPreferredSize(new Dimension(0, 200));
         panel.add(scroll);
+
+        PaperCommentsPanel commentsView = new PaperCommentsPanel(translator);
+
+        new InteractionController(
+            interactionService,
+            translator,
+            currentUser,
+            paper.id().orElseThrow(),
+            commentsView
+        );
+
+        panel.add(commentsView);
 
         return panel;
     }

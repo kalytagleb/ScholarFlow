@@ -23,6 +23,7 @@ import com.scholarflow.presentation.main.models.PaperTableModel;
 import com.scholarflow.business.model.User;
 import com.scholarflow.business.service.PaperService;
 import com.scholarflow.business.service.FieldService;
+import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.presentation.main.view.DashboardSidebar;
 import com.scholarflow.presentation.main.view.PaperDetailsFrame;
@@ -34,6 +35,7 @@ public final class DashboardController {
     private final Translator translator;
     private final PaperService paperService;
     private final FieldService fieldService;
+    private final InteractionService interactionService;
     private final DashboardSidebar sidebar;
     private final JPanel contentContainer;
     private final JFrame frame;
@@ -43,6 +45,7 @@ public final class DashboardController {
         final Translator translator,
         final PaperService paperService,
         final FieldService fieldService,
+        final InteractionService interactionService,
         final DashboardSidebar sidebar,
         final JPanel contentContainer,
         final JFrame frame
@@ -51,6 +54,7 @@ public final class DashboardController {
         this.translator = Objects.requireNonNull(translator);
         this.paperService = Objects.requireNonNull(paperService);
         this.fieldService = Objects.requireNonNull(fieldService);
+        this.interactionService = Objects.requireNonNull(interactionService);
         this.sidebar = Objects.requireNonNull(sidebar);
         this.contentContainer = Objects.requireNonNull(contentContainer);
         this.frame = Objects.requireNonNull(frame);
@@ -135,7 +139,7 @@ public final class DashboardController {
             PaperListPanel listPanel = new PaperListPanel(model, translator);
 
             listPanel.onPaperSelected(paper -> {
-                new PaperDetailsFrame(paper, translator).open();
+                new PaperDetailsFrame(paper, user, translator, interactionService).open();
             });
 
             this.replaceContent(listPanel);

@@ -3,12 +3,15 @@ package com.scholarflow;
 import javax.swing.SwingUtilities;
 
 import com.scholarflow.business.service.FieldService;
+import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.business.service.UserService;
 import com.scholarflow.business.service.PaperService;
 import com.scholarflow.data.connection.DatabaseConfig;
 import com.scholarflow.data.connection.DatabaseConnectionPool;
 import com.scholarflow.data.jdbc.JdbcFieldRepository;
+import com.scholarflow.data.jdbc.JdbcPaperCommentRepository;
+import com.scholarflow.data.jdbc.JdbcPaperLikeRepository;
 import com.scholarflow.data.jdbc.JdbcUserRepository;
 import com.scholarflow.data.jdbc.JdbcPaperRepository;
 import com.scholarflow.data.jdbc.JdbcPaperVersionRepository;
@@ -29,11 +32,16 @@ public final class Main {
             );
             UserService userService = new UserService(new JdbcUserRepository(pool));
             FieldService fieldService = new FieldService(new JdbcFieldRepository(pool));
+            InteractionService interactionService = new InteractionService(
+                new JdbcPaperCommentRepository(pool),
+                new JdbcPaperLikeRepository(pool), 
+                new JdbcPaperRepository(pool)
+            );
 
             Translator translator = new Translator("en");
 
             SwingUtilities.invokeLater(() -> {
-                new LoginFrame(userService, fieldService, paperService, translator).open();
+                new LoginFrame(userService, fieldService, paperService, interactionService, translator).open();
             });
         } catch (Exception e) {
             System.err.println("Failed to start application: " + e.getMessage());

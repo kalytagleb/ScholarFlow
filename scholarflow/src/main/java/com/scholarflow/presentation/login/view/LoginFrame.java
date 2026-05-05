@@ -3,6 +3,7 @@ package com.scholarflow.presentation.login.view;
 import javax.swing.JFrame;
 
 import com.scholarflow.business.service.FieldService;
+import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.PaperService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.business.service.UserService;
@@ -11,7 +12,13 @@ import com.scholarflow.presentation.login.controller.LoginController;
 public final class LoginFrame {
     private final JFrame frame;
 
-    public LoginFrame(final UserService userService, final FieldService fieldService, final PaperService paperService, final Translator translator) {
+    public LoginFrame(
+        final UserService userService,
+        final FieldService fieldService, 
+        final PaperService paperService, 
+        final InteractionService interactionService,
+        final Translator translator
+    ) {
         this.frame = new JFrame("Scholarflow - " + translator.translate("login.title"));
 
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -20,7 +27,15 @@ public final class LoginFrame {
         this.frame.setLocationRelativeTo(null);
 
         final LoginPanel panel = new LoginPanel(translator);
-        new LoginController(userService, fieldService, panel, frame, translator, paperService);
+        new LoginController(
+            userService, 
+            fieldService, 
+            panel, 
+            frame, 
+            translator, 
+            paperService,
+            interactionService
+        );
 
         this.frame.add(panel);
     }

@@ -7,6 +7,7 @@ import javax.swing.SwingWorker;
 
 import com.scholarflow.business.model.User;
 import com.scholarflow.business.service.FieldService;
+import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.PaperService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.business.service.UserService;
@@ -19,16 +20,26 @@ public final class LoginController {
     private final LoginPanel view;
     private final JFrame frame;
     private final FieldService fieldService;
+    private final InteractionService interactionService;
     private final Translator translator;
     private final PaperService paperService;
 
-    public LoginController(UserService userService, FieldService fieldService, LoginPanel view, JFrame frame, Translator translator, PaperService paperService) {
+    public LoginController(
+        UserService userService, 
+        FieldService fieldService, 
+        LoginPanel view, 
+        JFrame frame, 
+        Translator translator, 
+        PaperService paperService,
+        InteractionService interactionService
+    ) {
         this.userService = userService;
         this.fieldService = fieldService;
         this.view = view;
         this.frame = frame;
         this.translator = translator;
         this.paperService = paperService;
+        this.interactionService = interactionService;
         this.init();
     }
 
@@ -71,7 +82,7 @@ public final class LoginController {
                         // JOptionPane.showMessageDialog(null, "Welcome, " + user.get().fullName());
 
                         User loggedUser = user.get();
-                        new DashboardFrame(loggedUser, translator, paperService, fieldService).open();
+                        new DashboardFrame(loggedUser, translator, paperService, fieldService, interactionService).open();
 
                         System.out.println("User " + loggedUser.username() + " opened dashboard.");
                     } else {
@@ -88,6 +99,6 @@ public final class LoginController {
     }
 
     private void handleOpenRegister() {
-        new RegisterFrame(userService, fieldService, paperService, translator, this.frame).open();
+        new RegisterFrame(userService, fieldService, paperService, translator, this.frame, interactionService).open();
     }
 }
