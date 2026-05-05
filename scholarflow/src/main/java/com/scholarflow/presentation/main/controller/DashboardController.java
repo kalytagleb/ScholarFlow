@@ -25,6 +25,7 @@ import com.scholarflow.business.service.PaperService;
 import com.scholarflow.business.service.FieldService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.presentation.main.view.DashboardSidebar;
+import com.scholarflow.presentation.main.view.PaperDetailsFrame;
 import com.scholarflow.presentation.main.view.PaperListPanel;
 
 public final class DashboardController {
@@ -123,8 +124,17 @@ public final class DashboardController {
         try {
             TableLoadResult result = worker.get();
 
-            PaperTableModel model = new PaperTableModel(result.papers(), translator, result.fieldMap());
+            PaperTableModel model = new PaperTableModel(
+                result.papers(),
+                translator,
+                result.fieldMap()
+            );
+
             PaperListPanel listPanel = new PaperListPanel(model, translator);
+
+            listPanel.onPaperSelected(paper -> {
+                new PaperDetailsFrame(paper, translator).open();
+            });
 
             this.replaceContent(listPanel);
         } catch (Exception e) {

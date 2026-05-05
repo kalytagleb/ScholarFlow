@@ -3,7 +3,6 @@ package com.scholarflow.presentation.login.controller;
 import java.util.Optional;
 
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import com.scholarflow.business.model.User;

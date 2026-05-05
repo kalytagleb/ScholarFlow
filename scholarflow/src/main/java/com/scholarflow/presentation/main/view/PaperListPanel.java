@@ -3,7 +3,10 @@ package com.scholarflow.presentation.main.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -60,5 +63,22 @@ public final class PaperListPanel extends JPanel {
     public void adapt(Translator newTranslator) {
         this.title.setText(newTranslator.translate("dashboard.papers_list"));
         this.table.repaint();
+    }
+
+    public void onPaperSelected(Consumer<Paper> action) {
+        this.table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int viewRow = table.getSelectedRow();
+
+                    if (viewRow != -1) {
+                        int modelRow = table.convertRowIndexToModel(viewRow);
+                        PaperTableModel model = (PaperTableModel) table.getModel();
+                        action.accept(model.paper(modelRow));
+                    }
+                }
+            }
+        });
     }
 }
