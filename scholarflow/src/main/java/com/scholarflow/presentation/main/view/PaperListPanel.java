@@ -49,6 +49,8 @@ public final class PaperListPanel extends JPanel {
         scrollPane.getViewport().setBackground(Color.WHITE);
 
         this.add(scrollPane, BorderLayout.CENTER);
+
+        this.table.getColumnModel().getColumn(2).setCellRenderer(new StatusCellRenderer(translator));
     }
 
     public int selectionIndex() {
