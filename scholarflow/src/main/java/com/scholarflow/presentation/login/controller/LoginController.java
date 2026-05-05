@@ -72,7 +72,7 @@ public final class LoginController {
                         // JOptionPane.showMessageDialog(null, "Welcome, " + user.get().fullName());
 
                         User loggedUser = user.get();
-                        new DashboardFrame(loggedUser, translator, paperService).open();
+                        new DashboardFrame(loggedUser, translator, paperService, fieldService).open();
 
                         System.out.println("User " + loggedUser.username() + " opened dashboard.");
                     } else {

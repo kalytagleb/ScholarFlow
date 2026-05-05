@@ -123,7 +123,7 @@ public final class RegisterController {
                     registerFrame.dispose();
                     loginFrame.dispose();
                     
-                    new DashboardFrame(newUser, translator, paperService).open();
+                    new DashboardFrame(newUser, translator, paperService, fieldService).open();
 
                     JOptionPane.showMessageDialog(null, translator.translate("register.success_welcome") + " " + newUser.fullName());
                 } catch (Exception e) {

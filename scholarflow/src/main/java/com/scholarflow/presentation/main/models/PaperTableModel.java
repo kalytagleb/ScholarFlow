@@ -1,6 +1,9 @@
 package com.scholarflow.presentation.main.models;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import com.scholarflow.business.model.Paper;
 import com.scholarflow.business.service.Translator;
 
@@ -9,10 +12,16 @@ import javax.swing.table.AbstractTableModel;
 public final class PaperTableModel extends AbstractTableModel {
     private final List<Paper> papers;
     private final Translator translator;
+    private final Map<UUID, String> fieldNames;
 
-    public PaperTableModel(final List<Paper> papers, final Translator translator) {
+    public PaperTableModel(
+        final List<Paper> papers,
+        final Translator translator,
+        final Map<UUID, String> fieldNames
+    ) {
         this.papers = List.copyOf(papers);
         this.translator = translator;
+        this.fieldNames = Map.copyOf(fieldNames);
     }
 
     @Override
@@ -41,9 +50,12 @@ public final class PaperTableModel extends AbstractTableModel {
         final Paper paper = this.papers.get(row);
         return switch (col) {
             case 0 -> paper.title();
-            case 1 -> paper.fieldId(); 
+            case 1 -> fieldNames.getOrDefault(paper.fieldId(), "Unknown");
             case 2 -> paper.status(); 
-            case 3 -> paper.createdAt().map(d -> d.toLocalDate().toString()).orElse("-");
+            case 3 -> paper.createdAt()
+                .map(d -> d.toLocalDate().toString())
+                .orElse("-");
+                
             default -> "";
         };
     }

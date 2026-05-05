@@ -23,10 +23,10 @@ public final class PaperListPanel extends JPanel {
     private final JTable table;
     private final JLabel title;
 
-    public PaperListPanel(final List<Paper> data, final Translator translator) {
+    public PaperListPanel(final PaperTableModel model, final Translator translator) {
         this.translator = translator;
-        this.table = new JTable(new PaperTableModel(data, translator));
         this.title = new JLabel(translator.translate("dashboard.papers_list"));
+        this.table = new JTable(model);
 
         this.setLayout(new BorderLayout(0, 20));
         this.setBackground(Color.WHITE);
@@ -44,13 +44,13 @@ public final class PaperListPanel extends JPanel {
         this.table.setShowVerticalLines(false);
         this.table.setGridColor(new Color(236, 240, 241));
 
+        this.table.getColumnModel().getColumn(2).setCellRenderer(new StatusCellRenderer(translator));
+
         JScrollPane scrollPane = new JScrollPane(this.table);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(236, 240, 241)));
         scrollPane.getViewport().setBackground(Color.WHITE);
 
         this.add(scrollPane, BorderLayout.CENTER);
-
-        this.table.getColumnModel().getColumn(2).setCellRenderer(new StatusCellRenderer(translator));
     }
 
     public int selectionIndex() {

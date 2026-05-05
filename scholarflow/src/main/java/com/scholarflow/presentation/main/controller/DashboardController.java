@@ -5,7 +5,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -14,10 +16,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
+import java.util.stream.Collectors;
 
 import com.scholarflow.business.model.Paper;
+import com.scholarflow.presentation.main.models.PaperTableModel;
 import com.scholarflow.business.model.User;
 import com.scholarflow.business.service.PaperService;
+import com.scholarflow.business.service.FieldService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.presentation.main.view.DashboardSidebar;
 import com.scholarflow.presentation.main.view.PaperListPanel;
@@ -26,6 +31,7 @@ public final class DashboardController {
     private final User user;
     private final Translator translator;
     private final PaperService paperService;
+    private final FieldService fieldService;
     private final DashboardSidebar sidebar;
     private final JPanel contentContainer;
     private final JFrame frame;
@@ -34,6 +40,7 @@ public final class DashboardController {
         final User user,
         final Translator translator,
         final PaperService paperService,
+        final FieldService fieldService,
         final DashboardSidebar sidebar,
         final JPanel contentContainer,
         final JFrame frame
@@ -41,6 +48,7 @@ public final class DashboardController {
         this.user = Objects.requireNonNull(user);
         this.translator = Objects.requireNonNull(translator);
         this.paperService = Objects.requireNonNull(paperService);
+        this.fieldService = Objects.requireNonNull(fieldService);
         this.sidebar = Objects.requireNonNull(sidebar);
         this.contentContainer = Objects.requireNonNull(contentContainer);
         this.frame = Objects.requireNonNull(frame);
@@ -62,14 +70,21 @@ public final class DashboardController {
     private void handleShowAllPapers() {
         this.replaceContent(new JLabel(translator.translate("status.loading"), SwingConstants.CENTER));
 
-        new SwingWorker<List<Paper>, Void>() {
+        new SwingWorker<TableLoadResult, Void>() {
             @Override
-            protected List<Paper> doInBackground() {
-                if (user.hasAdminPrivileges()) {
-                    return paperService.findAllForAdmin(user);
-                }
+            protected TableLoadResult doInBackground() {
+                // Load articles
+                List<Paper> papers = user.hasAdminPrivileges()
+                    ? paperService.findAllForAdmin(user)
+                    : paperService.findPublishedPapers();
 
-                return paperService.findPublishedPapers();
+                Map<UUID, String> fieldMap = fieldService.getAllFields().stream()
+                    .collect(Collectors.toMap(
+                        f -> f.id().orElseThrow(), // Key
+                        f -> f.localizedName(translator.currentLanguage())
+                    ));
+
+                return new TableLoadResult(papers, fieldMap);
             }
 
             @Override
@@ -80,12 +95,21 @@ public final class DashboardController {
     }
 
     private void handleShowMyPapers() {
-        this.replaceContent(new JLabel(translator.translate("status.loading")));
+        this.replaceContent(new JLabel(translator.translate("status.loading"), SwingConstants.CENTER));
 
-        new SwingWorker<List<Paper>, Void>() {
+        new SwingWorker<TableLoadResult, Void>() {
             @Override
-            protected List<Paper> doInBackground() {
-                return paperService.findByAuthor(user.id().orElseThrow());
+            protected TableLoadResult doInBackground() {
+                // Load articles
+                List<Paper> papers = paperService.findByAuthor(user.id().orElseThrow());
+
+                Map<UUID, String> fieldMap = fieldService.getAllFields().stream()
+                    .collect(Collectors.toMap(
+                        f -> f.id().orElseThrow(), // Key
+                        f -> f.localizedName(translator.currentLanguage())
+                    ));
+
+                return new TableLoadResult(papers, fieldMap);
             }
 
             @Override
@@ -95,11 +119,14 @@ public final class DashboardController {
         }.execute();
     }
 
-    private void updateUIWithData(SwingWorker<List<Paper>, Void> worker) {
+    private void updateUIWithData(SwingWorker<TableLoadResult, Void> worker) {
         try {
-            List<Paper> data = worker.get();
+            TableLoadResult result = worker.get();
 
-            this.replaceContent(new PaperListPanel(data, translator));
+            PaperTableModel model = new PaperTableModel(result.papers(), translator, result.fieldMap());
+            PaperListPanel listPanel = new PaperListPanel(model, translator);
+
+            this.replaceContent(listPanel);
         } catch (Exception e) {
             this.replaceContent(new JLabel("Error: " + e.getMessage()));
         }
@@ -138,4 +165,9 @@ public final class DashboardController {
             System.out.println("User logged out.");
         }
     }
+
+    private record TableLoadResult(
+        List<Paper> papers,
+        Map<UUID, String> fieldMap
+    ) {}
 }
