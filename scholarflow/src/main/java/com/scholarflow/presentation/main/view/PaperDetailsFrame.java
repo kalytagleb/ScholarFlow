@@ -21,14 +21,20 @@ import javax.swing.border.EmptyBorder;
 
 import com.scholarflow.business.model.Paper;
 import com.scholarflow.business.model.User;
+import com.scholarflow.business.model.enums.PaperStatus;
 import com.scholarflow.business.service.InteractionService;
+import com.scholarflow.business.service.ReviewService;
 import com.scholarflow.business.service.Translator;
+import com.scholarflow.business.service.UserService;
 import com.scholarflow.presentation.common.StatusBadge;
 import com.scholarflow.presentation.main.controller.InteractionController;
+import com.scholarflow.presentation.main.controller.ReviewAssignmentController;
 
 public final class PaperDetailsFrame {
     private final JFrame frame;
     private final Paper paper;
+    private final UserService userService;
+    private final ReviewService reviewService;
     private final Translator translator;
     private final User currentUser;
     private final InteractionService interactionService;
@@ -38,11 +44,15 @@ public final class PaperDetailsFrame {
     public PaperDetailsFrame(
         final Paper paper, 
         final User currentUser,
+        final UserService userService,
+        final ReviewService reviewService,
         final Translator translator,
         final InteractionService interactionService
     ) {
         this.paper = Objects.requireNonNull(paper);
         this.currentUser = Objects.requireNonNull(currentUser);
+        this.userService = Objects.requireNonNull(userService);
+        this.reviewService = Objects.requireNonNull(reviewService);
         this.translator = Objects.requireNonNull(translator);
         this.interactionService = Objects.requireNonNull(interactionService);
         this.frame = new JFrame(translator.translate("details.title"));
@@ -135,6 +145,21 @@ public final class PaperDetailsFrame {
         );
 
         panel.add(commentsView);
+
+        if (currentUser.hasAdminPrivileges() && paper.status() != PaperStatus.ACCEPTED) {
+            ReviewAssignmentPanel assignView = new ReviewAssignmentPanel(translator);
+
+            new ReviewAssignmentController(
+                reviewService, 
+                userService, 
+                translator, 
+                currentUser, 
+                paper.id().get(), 
+                assignView
+            );
+
+            panel.add(assignView);
+        }
 
         return panel;
     }

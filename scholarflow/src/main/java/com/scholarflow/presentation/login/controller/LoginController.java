@@ -9,6 +9,7 @@ import com.scholarflow.business.model.User;
 import com.scholarflow.business.service.FieldService;
 import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.PaperService;
+import com.scholarflow.business.service.ReviewService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.business.service.UserService;
 import com.scholarflow.presentation.login.view.LoginPanel;
@@ -17,6 +18,7 @@ import com.scholarflow.presentation.register.view.RegisterFrame;
 
 public final class LoginController {
     private final UserService userService;
+    private final ReviewService reviewService;
     private final LoginPanel view;
     private final JFrame frame;
     private final FieldService fieldService;
@@ -26,6 +28,7 @@ public final class LoginController {
 
     public LoginController(
         UserService userService, 
+        ReviewService reviewService,
         FieldService fieldService, 
         LoginPanel view, 
         JFrame frame, 
@@ -34,6 +37,7 @@ public final class LoginController {
         InteractionService interactionService
     ) {
         this.userService = userService;
+        this.reviewService = reviewService;
         this.fieldService = fieldService;
         this.view = view;
         this.frame = frame;
@@ -82,7 +86,15 @@ public final class LoginController {
                         // JOptionPane.showMessageDialog(null, "Welcome, " + user.get().fullName());
 
                         User loggedUser = user.get();
-                        new DashboardFrame(loggedUser, translator, paperService, fieldService, interactionService).open();
+                        new DashboardFrame(
+                            loggedUser, 
+                            translator, 
+                            paperService, 
+                            fieldService, 
+                            interactionService,
+                            userService,
+                            reviewService
+                        ).open();
 
                         System.out.println("User " + loggedUser.username() + " opened dashboard.");
                     } else {
@@ -99,6 +111,6 @@ public final class LoginController {
     }
 
     private void handleOpenRegister() {
-        new RegisterFrame(userService, fieldService, paperService, translator, this.frame, interactionService).open();
+        new RegisterFrame(userService, reviewService, fieldService, paperService, translator, this.frame, interactionService).open();
     }
 }

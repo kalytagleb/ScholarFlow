@@ -22,9 +22,11 @@ import com.scholarflow.business.model.Paper;
 import com.scholarflow.presentation.main.models.PaperTableModel;
 import com.scholarflow.business.model.User;
 import com.scholarflow.business.service.PaperService;
+import com.scholarflow.business.service.ReviewService;
 import com.scholarflow.business.service.FieldService;
 import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.Translator;
+import com.scholarflow.business.service.UserService;
 import com.scholarflow.presentation.main.view.DashboardSidebar;
 import com.scholarflow.presentation.main.view.PaperDetailsFrame;
 import com.scholarflow.presentation.main.view.PaperListPanel;
@@ -36,6 +38,8 @@ public final class DashboardController {
     private final PaperService paperService;
     private final FieldService fieldService;
     private final InteractionService interactionService;
+    private final UserService userService;
+    private final ReviewService reviewService;
     private final DashboardSidebar sidebar;
     private final JPanel contentContainer;
     private final JFrame frame;
@@ -46,6 +50,8 @@ public final class DashboardController {
         final PaperService paperService,
         final FieldService fieldService,
         final InteractionService interactionService,
+        final UserService userService,
+        final ReviewService reviewService,
         final DashboardSidebar sidebar,
         final JPanel contentContainer,
         final JFrame frame
@@ -55,6 +61,8 @@ public final class DashboardController {
         this.paperService = Objects.requireNonNull(paperService);
         this.fieldService = Objects.requireNonNull(fieldService);
         this.interactionService = Objects.requireNonNull(interactionService);
+        this.userService = Objects.requireNonNull(userService);
+        this.reviewService = Objects.requireNonNull(reviewService);
         this.sidebar = Objects.requireNonNull(sidebar);
         this.contentContainer = Objects.requireNonNull(contentContainer);
         this.frame = Objects.requireNonNull(frame);
@@ -72,6 +80,10 @@ public final class DashboardController {
         // ONly for researches
         this.sidebar.onMyPapersClick(this::handleShowMyPapers);
         this.sidebar.onNewPaperClick(this::handleOpenSubmissionForm);
+
+        this.sidebar.onReviewAssignmentsClick(() -> {
+            this.replaceContent(new JLabel("Admin Review Management"));
+        });
     }
 
     private void handleShowAllPapers() {
@@ -139,7 +151,14 @@ public final class DashboardController {
             PaperListPanel listPanel = new PaperListPanel(model, translator);
 
             listPanel.onPaperSelected(paper -> {
-                new PaperDetailsFrame(paper, user, translator, interactionService).open();
+                new PaperDetailsFrame(
+                    paper, 
+                    user, 
+                    userService,
+                    reviewService,
+                    translator, 
+                    interactionService
+                ).open();
             });
 
             this.replaceContent(listPanel);

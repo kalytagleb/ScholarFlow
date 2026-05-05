@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 import com.scholarflow.business.service.FieldService;
 import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.PaperService;
+import com.scholarflow.business.service.ReviewService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.business.service.UserService;
 import com.scholarflow.presentation.login.controller.LoginController;
@@ -14,6 +15,7 @@ public final class LoginFrame {
 
     public LoginFrame(
         final UserService userService,
+        final ReviewService reviewService,
         final FieldService fieldService, 
         final PaperService paperService, 
         final InteractionService interactionService,
@@ -29,6 +31,7 @@ public final class LoginFrame {
         final LoginPanel panel = new LoginPanel(translator);
         new LoginController(
             userService, 
+            reviewService,
             fieldService, 
             panel, 
             frame, 

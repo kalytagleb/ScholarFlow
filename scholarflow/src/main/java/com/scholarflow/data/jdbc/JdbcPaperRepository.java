@@ -39,6 +39,7 @@ public final class JdbcPaperRepository implements PaperRepository {
                 return Optional.empty();
             }
         } catch (SQLException ex) {
+            ex.printStackTrace();
             throw new RepositoryException("Error finding paper by id: " + id, ex);
         }
     }
@@ -64,7 +65,7 @@ public final class JdbcPaperRepository implements PaperRepository {
     @Override
     public Paper save(final Paper paper) {
         final String sql = """
-                INSERT INTO papers (title, abstract, keywords, doi, field_id, submitter_id, status)
+                INSERT INTO papers (title, \"abstract\", keywords, doi, field_id, submitter_id, status)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 RETURNING *
                 """;
@@ -87,6 +88,7 @@ public final class JdbcPaperRepository implements PaperRepository {
                 throw new RepositoryException("Failed to save paper");
             }
         } catch (SQLException ex) {
+            ex.printStackTrace();
             throw new RepositoryException("Error saving paper: " + paper.title(), ex);
         }
     }
@@ -95,7 +97,7 @@ public final class JdbcPaperRepository implements PaperRepository {
     public void update(final Paper paper) {
         final String sql = """
             UPDATE papers 
-            SET title = ?, abstract = ?, keywords = ?, doi = ?, status = ?, updated_at = NOW()
+            SET title = ?, \"abstract\" = ?, keywords = ?, doi = ?, status = ?, updated_at = NOW()
             WHERE id = ?
             """;
         try (Connection conn = pool.connection();
@@ -111,6 +113,7 @@ public final class JdbcPaperRepository implements PaperRepository {
 
             stmt.executeUpdate();
         } catch (SQLException ex) {
+            ex.printStackTrace();
             throw new RepositoryException("Error updating paper: " + paper.title(), ex);
         }
     }
@@ -121,7 +124,9 @@ public final class JdbcPaperRepository implements PaperRepository {
         try (Connection conn = pool.connection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            stmt.setObject(1, param);
+            if (param != null) {
+                stmt.setObject(1, param);
+            }
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -130,6 +135,7 @@ public final class JdbcPaperRepository implements PaperRepository {
             }
             return results;
         } catch (SQLException ex) {
+            ex.printStackTrace();
             throw new RepositoryException("Error fetching papers list", ex);
         }
     }

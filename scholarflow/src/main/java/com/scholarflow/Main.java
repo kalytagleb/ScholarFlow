@@ -7,6 +7,7 @@ import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.business.service.UserService;
 import com.scholarflow.business.service.PaperService;
+import com.scholarflow.business.service.ReviewService;
 import com.scholarflow.data.connection.DatabaseConfig;
 import com.scholarflow.data.connection.DatabaseConnectionPool;
 import com.scholarflow.data.jdbc.JdbcFieldRepository;
@@ -15,6 +16,8 @@ import com.scholarflow.data.jdbc.JdbcPaperLikeRepository;
 import com.scholarflow.data.jdbc.JdbcUserRepository;
 import com.scholarflow.data.jdbc.JdbcPaperRepository;
 import com.scholarflow.data.jdbc.JdbcPaperVersionRepository;
+import com.scholarflow.data.jdbc.JdbcReviewAssignmentRepository;
+import com.scholarflow.data.jdbc.JdbcReviewRepository;
 import com.scholarflow.data.jdbc.JdbcStatusHistoryRepository;
 import com.scholarflow.presentation.login.view.LoginFrame;
 
@@ -37,11 +40,16 @@ public final class Main {
                 new JdbcPaperLikeRepository(pool), 
                 new JdbcPaperRepository(pool)
             );
+            ReviewService reviewService = new ReviewService(
+                new JdbcReviewAssignmentRepository(pool), 
+                new JdbcReviewRepository(pool), 
+                new JdbcPaperRepository(pool)
+            );
 
             Translator translator = new Translator("en");
 
             SwingUtilities.invokeLater(() -> {
-                new LoginFrame(userService, fieldService, paperService, interactionService, translator).open();
+                new LoginFrame(userService, reviewService, fieldService, paperService, interactionService, translator).open();
             });
         } catch (Exception e) {
             System.err.println("Failed to start application: " + e.getMessage());

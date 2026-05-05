@@ -28,6 +28,7 @@ public final class DashboardSidebar extends JPanel {
     private final JButton reviewTasksBtn;
     private final JButton logoutBtn;
     private final JButton newPaperBtn;
+    private final JButton reviewAssignmentsBtn;
 
     public DashboardSidebar(final User user, final Translator translator) {
         this.user = Objects.requireNonNull(user);
@@ -39,6 +40,7 @@ public final class DashboardSidebar extends JPanel {
         this.reviewTasksBtn = createMenuButton("menu.review_tasks");
         this.logoutBtn = createMenuButton("menu.logout");
         this.newPaperBtn = createMenuButton("menu.new_paper");
+        this.reviewAssignmentsBtn = createMenuButton("menu.review_tasks");
 
         this.setupLayout();
     }
@@ -66,6 +68,11 @@ public final class DashboardSidebar extends JPanel {
 
         if (user.canReview()) {
             this.add(reviewTasksBtn);
+            this.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+
+        if (user.hasAdminPrivileges()) {
+            this.add(reviewAssignmentsBtn);
             this.add(Box.createRigidArea(new Dimension(0, 5)));
         }
 
@@ -110,5 +117,9 @@ public final class DashboardSidebar extends JPanel {
 
     public void onNewPaperClick(Runnable action) {
         newPaperBtn.addActionListener(e -> action.run());
+    }
+
+    public void onReviewAssignmentsClick(Runnable action) {
+        reviewAssignmentsBtn.addActionListener(e -> action.run());
     }
 }

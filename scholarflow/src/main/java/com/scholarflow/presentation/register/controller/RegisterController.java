@@ -14,6 +14,7 @@ import com.scholarflow.business.model.User;
 import com.scholarflow.business.service.FieldService;
 import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.PaperService;
+import com.scholarflow.business.service.ReviewService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.business.service.UserService;
 import com.scholarflow.presentation.main.view.DashboardFrame;
@@ -21,6 +22,7 @@ import com.scholarflow.presentation.register.view.RegisterPanel;
 
 public final class RegisterController {
     private final UserService userService;
+    private final ReviewService reviewService;
     private final FieldService fieldService;
     private final Translator translator;
     private final RegisterPanel view;
@@ -34,6 +36,7 @@ public final class RegisterController {
 
     public RegisterController(
         UserService userService,
+        ReviewService reviewService,
         FieldService fieldService,
         PaperService paperService,
         InteractionService interactionService,
@@ -43,6 +46,7 @@ public final class RegisterController {
         JFrame loginFrame
     ) {
         this.userService = Objects.requireNonNull(userService);
+        this.reviewService = Objects.requireNonNull(reviewService);
         this.fieldService = Objects.requireNonNull(fieldService);
         this.paperService = Objects.requireNonNull(paperService);
         this.interactionService = Objects.requireNonNull(interactionService);
@@ -127,7 +131,15 @@ public final class RegisterController {
                     registerFrame.dispose();
                     loginFrame.dispose();
                     
-                    new DashboardFrame(newUser, translator, paperService, fieldService, interactionService).open();
+                    new DashboardFrame(
+                        newUser, 
+                        translator, 
+                        paperService, 
+                        fieldService, 
+                        interactionService,
+                        userService,
+                        reviewService
+                    ).open();
 
                     JOptionPane.showMessageDialog(null, translator.translate("register.success_welcome") + " " + newUser.fullName());
                 } catch (Exception e) {

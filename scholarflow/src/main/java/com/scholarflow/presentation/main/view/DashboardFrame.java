@@ -13,7 +13,9 @@ import com.scholarflow.business.model.User;
 import com.scholarflow.business.service.FieldService;
 import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.PaperService;
+import com.scholarflow.business.service.ReviewService;
 import com.scholarflow.business.service.Translator;
+import com.scholarflow.business.service.UserService;
 import com.scholarflow.presentation.main.controller.DashboardController;
 
 public final class DashboardFrame {
@@ -25,7 +27,9 @@ public final class DashboardFrame {
         final Translator translator,
         final PaperService paperService, 
         final FieldService fieldService,
-        final InteractionService interactionService
+        final InteractionService interactionService,
+        final UserService userService,
+        final ReviewService reviewService
     ) {
         Objects.requireNonNull(user);
         Objects.requireNonNull(translator);
@@ -50,6 +54,8 @@ public final class DashboardFrame {
             paperService,
             fieldService,
             interactionService,
+            userService,
+            reviewService,
             sidebar, 
             contentContainer, 
             frame

@@ -2,11 +2,13 @@ package com.scholarflow.presentation.register.view;
 
 import javax.swing.JFrame;
 
+import com.scholarflow.business.model.Review;
 import com.scholarflow.business.service.FieldService;
 import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.business.service.UserService;
 import com.scholarflow.business.service.PaperService;
+import com.scholarflow.business.service.ReviewService;
 import com.scholarflow.presentation.register.controller.RegisterController;
 
 public final class RegisterFrame {
@@ -14,6 +16,7 @@ public final class RegisterFrame {
 
     public RegisterFrame(
         final UserService userService,
+        final ReviewService reviewService,
         final FieldService fieldService, 
         final PaperService paperService, 
         final Translator translator, 
@@ -29,6 +32,7 @@ public final class RegisterFrame {
         final RegisterPanel panel = new RegisterPanel(translator);
         new RegisterController(
             userService, 
+            reviewService,
             fieldService, 
             paperService, 
             interactionService,

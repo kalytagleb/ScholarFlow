@@ -1,5 +1,6 @@
 package com.scholarflow.business.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,6 +47,18 @@ public final class UserService {
 
     public List<User> findAllActive() {
         return userRepository.findAllActive();
+    }
+
+    public List<User> findByRole(final String role) {
+        if (role == null || role.isBlank()) {
+            return Collections.emptyList();
+        }
+
+        return userRepository.findByRole(role.toUpperCase());
+    }
+
+    public List<User> findAllReviewers() {
+        return this.findByRole("REVIEWER");
     }
 
     public void deactivateUser(UUID id) {
