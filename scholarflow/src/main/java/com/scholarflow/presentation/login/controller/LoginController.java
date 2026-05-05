@@ -8,6 +8,7 @@ import javax.swing.SwingWorker;
 
 import com.scholarflow.business.model.User;
 import com.scholarflow.business.service.FieldService;
+import com.scholarflow.business.service.PaperService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.business.service.UserService;
 import com.scholarflow.presentation.login.view.LoginPanel;
@@ -20,13 +21,15 @@ public final class LoginController {
     private final JFrame frame;
     private final FieldService fieldService;
     private final Translator translator;
+    private final PaperService paperService;
 
-    public LoginController(UserService userService, FieldService fieldService, LoginPanel view, JFrame frame, Translator translator) {
+    public LoginController(UserService userService, FieldService fieldService, LoginPanel view, JFrame frame, Translator translator, PaperService paperService) {
         this.userService = userService;
         this.fieldService = fieldService;
         this.view = view;
         this.frame = frame;
         this.translator = translator;
+        this.paperService = paperService;
         this.init();
     }
 
@@ -69,7 +72,7 @@ public final class LoginController {
                         // JOptionPane.showMessageDialog(null, "Welcome, " + user.get().fullName());
 
                         User loggedUser = user.get();
-                        new DashboardFrame(loggedUser, translator).open();
+                        new DashboardFrame(loggedUser, translator, paperService).open();
 
                         System.out.println("User " + loggedUser.username() + " opened dashboard.");
                     } else {
@@ -86,6 +89,6 @@ public final class LoginController {
     }
 
     private void handleOpenRegister() {
-        new RegisterFrame(userService, fieldService, translator, this.frame).open();
+        new RegisterFrame(userService, fieldService, paperService, translator, this.frame).open();
     }
 }

@@ -1,6 +1,8 @@
 package com.scholarflow.business.service;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.scholarflow.business.model.Paper;
@@ -152,5 +154,27 @@ public final class PaperService {
         ));
 
         return resubmitted;
+    }
+
+    // For READER. Shows checked articles
+    public List<Paper> findPublishedPapers() {
+        return paperRepo.findAllByStatus(PaperStatus.ACCEPTED);
+    }
+
+    // For ADMINS. 
+    public List<Paper> findAllForAdmin(User admin) {
+        if (!admin.hasAdminPrivileges()) {
+            throw new IllegalArgumentException("Access denied");
+        }
+
+        return paperRepo.findAll();
+    }
+
+    public List<Paper> findByAuthor(UUID authorId) {
+        return paperRepo.findAllBySubmitter(authorId);
+    }
+
+    public Optional<Paper> findById(UUID id) {
+        return paperRepo.findById(id);
     }
 }

@@ -44,6 +44,12 @@ public final class JdbcPaperRepository implements PaperRepository {
     }
 
     @Override
+    public List<Paper> findAll() {
+        final String sql = "SELECT * FROM papers ORDER BY created_at DESC";
+        return this.fetchList(sql, null);
+    }
+
+    @Override
     public List<Paper> findAllBySubmitter(final UUID submitterId) {
         final String sql = "SELECT * FROM papers WHERE submitter_id = ? ORDER BY created_at DESC";
         return this.fetchList(sql, submitterId);
