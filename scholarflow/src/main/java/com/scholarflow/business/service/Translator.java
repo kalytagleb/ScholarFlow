@@ -13,7 +13,12 @@ public final class Translator {
     }
 
     public String translate(String key) {
-        return bundle.getString(key);
+        if (bundle.containsKey(key)) {
+            return bundle.getString(key);
+        }
+
+        System.err.println("WARNING -> " + key);
+        return "!" + key + "!";
     }
 
     public String currentLanguage() {

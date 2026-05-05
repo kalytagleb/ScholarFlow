@@ -27,6 +27,7 @@ import com.scholarflow.business.service.Translator;
 import com.scholarflow.presentation.main.view.DashboardSidebar;
 import com.scholarflow.presentation.main.view.PaperDetailsFrame;
 import com.scholarflow.presentation.main.view.PaperListPanel;
+import com.scholarflow.presentation.main.view.PaperSubmissionPanel;
 
 public final class DashboardController {
     private final User user;
@@ -66,6 +67,7 @@ public final class DashboardController {
         this.sidebar.onAllPapersClick(this::handleShowAllPapers);
         // ONly for researches
         this.sidebar.onMyPapersClick(this::handleShowMyPapers);
+        this.sidebar.onNewPaperClick(this::handleOpenSubmissionForm);
     }
 
     private void handleShowAllPapers() {
@@ -174,6 +176,17 @@ public final class DashboardController {
             frame.dispose();
             System.out.println("User logged out.");
         }
+    }
+
+    private void handleOpenSubmissionForm() {
+        PaperSubmissionPanel submissionPanel = new PaperSubmissionPanel(translator);
+
+        new PaperSubmissionController(
+            user, paperService, fieldService, translator,
+            submissionPanel, this::handleShowMyPapers
+        );
+
+        this.replaceContent(submissionPanel);
     }
 
     private record TableLoadResult(

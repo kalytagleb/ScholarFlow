@@ -27,6 +27,7 @@ public final class DashboardSidebar extends JPanel {
     private final JButton myPapersBtn;
     private final JButton reviewTasksBtn;
     private final JButton logoutBtn;
+    private final JButton newPaperBtn;
 
     public DashboardSidebar(final User user, final Translator translator) {
         this.user = Objects.requireNonNull(user);
@@ -37,6 +38,7 @@ public final class DashboardSidebar extends JPanel {
         this.myPapersBtn = createMenuButton("menu.my_submissions");
         this.reviewTasksBtn = createMenuButton("menu.review_tasks");
         this.logoutBtn = createMenuButton("menu.logout");
+        this.newPaperBtn = createMenuButton("menu.new_paper");
 
         this.setupLayout();
     }
@@ -57,6 +59,8 @@ public final class DashboardSidebar extends JPanel {
 
         if (user.canSubmitPapers()) {
             this.add(myPapersBtn);
+            this.add(Box.createRigidArea(new Dimension(0, 5)));
+            this.add(newPaperBtn);
             this.add(Box.createRigidArea(new Dimension(0, 5)));
         }
 
@@ -103,4 +107,8 @@ public final class DashboardSidebar extends JPanel {
     public void onMyPapersClick(Runnable action) { myPapersBtn.addActionListener(e -> action.run()); }
     public void onReviewTasksClick(Runnable action) { reviewTasksBtn.addActionListener(e -> action.run()); }
     public void onLogoutClick(Runnable action) { logoutBtn.addActionListener(e -> action.run()); }
+
+    public void onNewPaperClick(Runnable action) {
+        newPaperBtn.addActionListener(e -> action.run());
+    }
 }
