@@ -3,6 +3,7 @@ package com.scholarflow.business.service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.scholarflow.business.model.Paper;
@@ -102,5 +103,18 @@ public final class ReviewService {
 
         return paperAssignments.stream()
             .allMatch(a -> a.status() == AssignmentStatus.COMPLETED);
+    }
+
+    public List<ReviewAssignment> findActiveTasks(final UUID reviewerId) {
+        return this.assignments.findByReviewer(reviewerId).stream()
+            .filter(a -> a.status() == AssignmentStatus.PENDING)
+            .toList();
+    }
+
+    public Optional<ReviewAssignment> findActiveAssignment(final UUID paperId, final UUID reviewerId) {
+        return this.assignments.findByPaper(paperId).stream()
+            .filter(a -> a.reviewerId().equals(reviewerId))
+            .filter(a -> a.status() == AssignmentStatus.PENDING)
+            .findFirst();
     }
 }

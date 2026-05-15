@@ -9,7 +9,7 @@ import com.scholarflow.business.service.Translator;
 
 import javax.swing.table.AbstractTableModel;
 
-public final class PaperTableModel extends AbstractTableModel {
+public final class PaperTableModel extends AbstractTableModel implements PaperProviderModel {
     private final List<Paper> papers;
     private final Translator translator;
     private final Map<UUID, String> fieldNames;

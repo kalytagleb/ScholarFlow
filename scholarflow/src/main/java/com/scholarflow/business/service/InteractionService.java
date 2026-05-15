@@ -42,7 +42,7 @@ public final class InteractionService {
 
         final UUID userId = user.id().orElseThrow();
 
-        final PaperComment comment = new PaperComment(paperId, userId, text);
+        final PaperComment comment = new PaperComment(paperId, userId, user.fullName(), text);
         this.comments.save(comment);
 
         return comment;

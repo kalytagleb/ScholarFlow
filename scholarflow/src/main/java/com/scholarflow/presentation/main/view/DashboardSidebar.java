@@ -40,7 +40,7 @@ public final class DashboardSidebar extends JPanel {
         this.reviewTasksBtn = createMenuButton("menu.review_tasks");
         this.logoutBtn = createMenuButton("menu.logout");
         this.newPaperBtn = createMenuButton("menu.new_paper");
-        this.reviewAssignmentsBtn = createMenuButton("menu.review_tasks");
+        this.reviewAssignmentsBtn = createMenuButton("menu.admin_panel");
 
         this.setupLayout();
     }

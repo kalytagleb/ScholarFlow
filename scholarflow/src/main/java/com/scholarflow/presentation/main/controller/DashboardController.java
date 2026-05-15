@@ -19,18 +19,23 @@ import javax.swing.SwingWorker;
 import java.util.stream.Collectors;
 
 import com.scholarflow.business.model.Paper;
+import com.scholarflow.business.model.ReviewAssignment;
 import com.scholarflow.presentation.main.models.PaperTableModel;
 import com.scholarflow.business.model.User;
 import com.scholarflow.business.service.PaperService;
 import com.scholarflow.business.service.ReviewService;
+import com.scholarflow.business.service.AuditService;
 import com.scholarflow.business.service.FieldService;
 import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.business.service.UserService;
+import com.scholarflow.business.service.XmlService;
+import com.scholarflow.presentation.main.view.AdminPanel;
 import com.scholarflow.presentation.main.view.DashboardSidebar;
 import com.scholarflow.presentation.main.view.PaperDetailsFrame;
 import com.scholarflow.presentation.main.view.PaperListPanel;
 import com.scholarflow.presentation.main.view.PaperSubmissionPanel;
+import com.scholarflow.presentation.main.view.ReviewerTaskTableModel;
 
 public final class DashboardController {
     private final User user;
@@ -40,6 +45,8 @@ public final class DashboardController {
     private final InteractionService interactionService;
     private final UserService userService;
     private final ReviewService reviewService;
+    private final AuditService auditService;
+    private final XmlService xmlService;
     private final DashboardSidebar sidebar;
     private final JPanel contentContainer;
     private final JFrame frame;
@@ -52,6 +59,8 @@ public final class DashboardController {
         final InteractionService interactionService,
         final UserService userService,
         final ReviewService reviewService,
+        final AuditService auditService,
+        final XmlService xmlService,
         final DashboardSidebar sidebar,
         final JPanel contentContainer,
         final JFrame frame
@@ -63,6 +72,8 @@ public final class DashboardController {
         this.interactionService = Objects.requireNonNull(interactionService);
         this.userService = Objects.requireNonNull(userService);
         this.reviewService = Objects.requireNonNull(reviewService);
+        this.auditService = Objects.requireNonNull(auditService);
+        this.xmlService = Objects.requireNonNull(xmlService);
         this.sidebar = Objects.requireNonNull(sidebar);
         this.contentContainer = Objects.requireNonNull(contentContainer);
         this.frame = Objects.requireNonNull(frame);
@@ -72,18 +83,14 @@ public final class DashboardController {
 
     private void init() {
         this.sidebar.onDashboardClick(this::showWelcomeMessage);
-        this.sidebar.onAllPapersClick(() -> this.replaceContent(new JLabel("All Papers List")));
-        this.sidebar.onMyPapersClick(() -> this.replaceContent(new JLabel("My Submissions")));
-        this.sidebar.onReviewTasksClick(() -> this.replaceContent(new JLabel("Review Tasks")));
+        this.sidebar.onReviewTasksClick(this::handleShowReviewerTasks);
         this.sidebar.onLogoutClick(this::handleLogout);
         this.sidebar.onAllPapersClick(this::handleShowAllPapers);
         // ONly for researches
         this.sidebar.onMyPapersClick(this::handleShowMyPapers);
         this.sidebar.onNewPaperClick(this::handleOpenSubmissionForm);
 
-        this.sidebar.onReviewAssignmentsClick(() -> {
-            this.replaceContent(new JLabel("Admin Review Management"));
-        });
+        this.sidebar.onReviewAssignmentsClick(this::handleShowAdminPanel);
     }
 
     private void handleShowAllPapers() {
@@ -151,14 +158,18 @@ public final class DashboardController {
             PaperListPanel listPanel = new PaperListPanel(model, translator);
 
             listPanel.onPaperSelected(paper -> {
-                new PaperDetailsFrame(
+                PaperDetailsFrame detailsFrame = new PaperDetailsFrame(
                     paper, 
                     user, 
                     userService,
                     reviewService,
                     translator, 
                     interactionService
-                ).open();
+                );
+
+                new PaperDetailsController(paperService, translator, paper, user, detailsFrame);
+
+                detailsFrame.open();
             });
 
             this.replaceContent(listPanel);
@@ -212,8 +223,90 @@ public final class DashboardController {
         this.replaceContent(submissionPanel);
     }
 
+    private void handleShowAdminPanel() {
+        AdminPanel adminView = new AdminPanel(translator);
+
+        new AdminController(
+            userService, 
+            paperService, 
+            xmlService, 
+            auditService, 
+            translator, 
+            user, 
+            adminView
+        );
+
+        this.replaceContent(adminView);
+    }
+
+    private void handleShowReviewerTasks() {
+        this.replaceContent(new JLabel(translator.translate("status.loading"), SwingConstants.CENTER));
+
+        new SwingWorker<ReviewerTasksResult, Void>() {
+            @Override
+            protected ReviewerTasksResult doInBackground() {
+                UUID myId = user.id().orElseThrow();
+                System.out.println("DEBUG: Current User ID: " + myId);
+
+                var tasks = reviewService.findActiveTasks(myId);
+                System.out.println("DEBUG: Tasks found in DB: " + tasks.size());
+
+                var papers = tasks.stream()
+                    .map(t -> paperService.findById(t.paperId()).orElse(null))
+                    .filter(Objects::nonNull)
+                    .toList();
+
+                System.out.println("DEBUG: Matching papers found: " + papers.size());
+
+                var fieldMap = fieldService.getAllFields().stream()
+                    .collect(Collectors.toMap(
+                        f -> f.id().get(), 
+                        f -> f.localizedName(translator.currentLanguage())
+                    ));
+                    
+                return new ReviewerTasksResult(papers, tasks, fieldMap);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    ReviewerTasksResult result = get();
+
+                    ReviewerTaskTableModel model = new ReviewerTaskTableModel(
+                        result.papers(), 
+                        result.assignments(), 
+                        translator, 
+                        result.fieldMap()
+                    );
+
+                    PaperListPanel listPanel = new PaperListPanel(model, translator);
+                    listPanel.onPaperSelected(paper -> {
+                        PaperDetailsFrame detailsView = new PaperDetailsFrame(
+                            paper, user, userService, reviewService, translator, interactionService
+                        );
+
+                        new PaperDetailsController(paperService, translator, paper, user, detailsView);
+                        detailsView.open();
+                    });
+
+                    replaceContent(listPanel);
+                } catch (Exception e) {
+                    System.err.println("CRITICAL UI ERROR:");
+                    replaceContent(new JLabel("Error loading tasks: " + e.getMessage()));
+                    e.printStackTrace();
+                }
+            }
+        }.execute();
+    }
+
     private record TableLoadResult(
         List<Paper> papers,
+        Map<UUID, String> fieldMap
+    ) {}
+
+    private record ReviewerTasksResult(
+        List<Paper> papers,
+        List<ReviewAssignment> assignments,
         Map<UUID, String> fieldMap
     ) {}
 }

@@ -19,6 +19,8 @@ import javax.swing.table.JTableHeader;
 
 import com.scholarflow.business.model.Paper;
 import com.scholarflow.business.service.Translator;
+import com.scholarflow.presentation.common.ModernTableStyle;
+import com.scholarflow.presentation.main.models.PaperProviderModel;
 import com.scholarflow.presentation.main.models.PaperTableModel;
 
 public final class PaperListPanel extends JPanel {
@@ -26,7 +28,7 @@ public final class PaperListPanel extends JPanel {
     private final JTable table;
     private final JLabel title;
 
-    public PaperListPanel(final PaperTableModel model, final Translator translator) {
+    public PaperListPanel(final PaperProviderModel model, final Translator translator) {
         this.translator = translator;
         this.title = new JLabel(translator.translate("dashboard.papers_list"));
         this.table = new JTable(model);
@@ -43,9 +45,7 @@ public final class PaperListPanel extends JPanel {
         this.title.setForeground(new Color(44, 62, 80));
         this.add(this.title, BorderLayout.NORTH);
 
-        this.table.setRowHeight(35);
-        this.table.setShowVerticalLines(false);
-        this.table.setGridColor(new Color(236, 240, 241));
+        new ModernTableStyle().apply(this.table);
 
         this.table.getColumnModel().getColumn(2).setCellRenderer(new StatusCellRenderer(translator));
 
@@ -74,7 +74,7 @@ public final class PaperListPanel extends JPanel {
 
                     if (viewRow != -1) {
                         int modelRow = table.convertRowIndexToModel(viewRow);
-                        PaperTableModel model = (PaperTableModel) table.getModel();
+                        PaperProviderModel model = (PaperProviderModel) table.getModel();
                         action.accept(model.paper(modelRow));
                     }
                 }

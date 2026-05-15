@@ -19,7 +19,7 @@ public final class PrimaryButton extends JButton {
         this.setBorderPainted(false);
         this.setFont(new Font("Segoe UI", Font.BOLD, 14));
         this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.setAlignmentX(Component.CENTER_ALIGNMENT);
+        this.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.setMaximumSize(new Dimension(300, 40));
     }
 }

@@ -45,7 +45,13 @@ public final class JdbcPaperCommentRepository implements PaperCommentRepository 
 
     @Override
     public List<PaperComment> findByPaper(final UUID paperId) {
-        final String sql = "SELECT * FROM paper_comments WHERE paper_id = ? ORDER BY created_at ASC";
+        final String sql = """
+                SELECT c.*, u.full_name
+                FROM paper_comments c
+                JOIN users u ON c.user_id = u.id
+                WHERE c.paper_id = ?
+                ORDER BY c.created_at ASC
+                """;
         final List<PaperComment> comments = new ArrayList<>();
 
         try (Connection conn = pool.connection();
@@ -84,6 +90,7 @@ public final class JdbcPaperCommentRepository implements PaperCommentRepository 
             rs.getObject("id", UUID.class),
             rs.getObject("paper_id", UUID.class), 
             rs.getObject("user_id", UUID.class),
+            rs.getString("full_name"),
             rs.getString("content"),
             rs.getObject("created_at", LocalDateTime.class)
         );

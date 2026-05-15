@@ -63,23 +63,38 @@ public final class PaperSubmissionPanel extends JPanel {
 
         addLabeledField(card, translator.translate("table.paper_title"), titleField);
 
-        card.add(createLabel(translator.translate("details.abstract_label")));
+        JLabel absLabel = createLabel(translator.translate("details.abstract_label"));
+        absLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        card.add(absLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 5)));
+
         abstractArea.setLineWrap(true);
         abstractArea.setWrapStyleWord(true);
-        abstractArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         JScrollPane scroll = new JScrollPane(abstractArea);
         scroll.setMaximumSize(new Dimension(400, 150));
+        scroll.setAlignmentX(Component.CENTER_ALIGNMENT); 
         card.add(scroll);
         card.add(Box.createRigidArea(new Dimension(0, 15)));
 
         addLabeledField(card, translator.translate("submit.keywords_label"), keywordsField);
-
-        card.add(createLabel(translator.translate("table.paper.field")));
+        
+        JLabel fieldLabel = createLabel(translator.translate("table.paper.field"));
+        fieldLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        card.add(fieldLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 5)));
+        
+        fieldCombo.setMaximumSize(new Dimension(400, 35));
+        fieldCombo.setAlignmentX(Component.CENTER_ALIGNMENT);
         card.add(fieldCombo);
-        card.add(Box.createRigidArea(new Dimension(0, 20)));
+        
+        card.add(Box.createRigidArea(new Dimension(0, 25)));
 
+        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         card.add(errorLabel);
         card.add(Box.createRigidArea(new Dimension(0, 10)));
+        
+        submitBtn.setAlignmentX(Component.CENTER_ALIGNMENT); 
+        submitBtn.setMaximumSize(new Dimension(400, 45));
         card.add(submitBtn);
 
         this.add(card, new GridBagConstraints());
@@ -94,11 +109,21 @@ public final class PaperSubmissionPanel extends JPanel {
     }
 
     private void addLabeledField(JPanel panel, String text, JTextField field) {
-        panel.add(createLabel(text));
+        JLabel label = createLabel(text);
+        label.setAlignmentX(Component.CENTER_ALIGNMENT); 
+        panel.add(label);
+        
         panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        
         field.setMaximumSize(new Dimension(400, 35));
         field.setPreferredSize(new Dimension(400, 35));
         field.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        field.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(220, 221, 225), 1),
+            javax.swing.BorderFactory.createEmptyBorder(0, 10, 0, 10)
+        ));
+        
         panel.add(field);
         panel.add(Box.createRigidArea(new Dimension(0, 15)));
     }

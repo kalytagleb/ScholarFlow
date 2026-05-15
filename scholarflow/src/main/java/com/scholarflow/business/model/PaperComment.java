@@ -9,6 +9,7 @@ public final class PaperComment {
     private final Optional<UUID> id;
     private final UUID paperId;
     private final UUID userId;
+    private final String authorName;
     private final String content;
     private final Optional<LocalDateTime> createdAt;
 
@@ -17,21 +18,24 @@ public final class PaperComment {
         final UUID id,
         final UUID paperId,
         final UUID userId,
+        final String authorName,
         final String content,
         final LocalDateTime createdAt
     ) {
         this.id = Optional.of(Objects.requireNonNull(id, "ID is required for existing comment"));
         this.paperId = Objects.requireNonNull(paperId, "Paper ID cannot be null");
         this.userId = Objects.requireNonNull(userId, "User ID cannot be null");
+        this.authorName = Objects.requireNonNull(authorName);
         this.content = this.validateContent(content);
         this.createdAt = Optional.of(Objects.requireNonNull(createdAt, "Timestamp is required"));
     }
 
     // For creating new comment by reader.
-    public PaperComment(final UUID paperId, final UUID userId, final String content) {
+    public PaperComment(final UUID paperId, final UUID userId, final String authorName, final String content) {
         this.id = Optional.empty();
         this.paperId = Objects.requireNonNull(paperId);
         this.userId = Objects.requireNonNull(userId);
+        this.authorName = Objects.requireNonNull(authorName);
         this.content = this.validateContent(content);
         this.createdAt = Optional.empty();
     }
@@ -59,6 +63,10 @@ public final class PaperComment {
 
     public UUID userId() {
         return userId;
+    }
+
+    public String authorName() {
+        return authorName;
     }
 
     public String content() {

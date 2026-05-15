@@ -23,6 +23,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.presentation.common.PrimaryButton;
+import com.scholarflow.presentation.common.RoleSwitcher;
 import com.scholarflow.presentation.common.SecondaryButton;
 import com.scholarflow.presentation.common.StyleComboBox;
 
@@ -42,7 +43,7 @@ public final class RegisterPanel extends JPanel {
     private final JPasswordField passwordField = new JPasswordField();
 
     // Choose role: READER or RESEARCHER
-    private final StyleComboBox<String> roleCombo = new StyleComboBox<>(new String[]{"READER", "RESEARCHER"});
+    private final RoleSwitcher roleSwitcher;
     // Choose scientific field (filled from DB)
     private final StyleComboBox<String> fieldCombo = new StyleComboBox<>(new String[0]);
 
@@ -50,6 +51,8 @@ public final class RegisterPanel extends JPanel {
     private final PrimaryButton registerBtn = new PrimaryButton("");
 
     public RegisterPanel(final Translator translator) {
+        this.roleSwitcher = new RoleSwitcher(translator);
+
         this.setLayout(new GridBagLayout());
         this.setBackground(new Color(245, 246, 250));
         this.setupLayout();
@@ -82,6 +85,8 @@ public final class RegisterPanel extends JPanel {
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 26));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        roleSwitcher.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         errorLabel.setForeground(new Color(231, 76, 60));
         errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -93,14 +98,21 @@ public final class RegisterPanel extends JPanel {
         this.addLabeledField(card, nameLabel, fullNameField);
         this.addLabeledField(card, passLabel, passwordField);
         
-        this.addLabeledField(card, roleChoiceLabel, roleCombo);
+        this.addLabeledField(card, roleChoiceLabel, roleSwitcher);
         this.addLabeledField(card, fieldChoiceLabel, fieldCombo);
 
         card.add(errorLabel);
         card.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        registerBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        registerBtn.setMaximumSize(new Dimension(280, 40));
         card.add(registerBtn);
 
         card.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        backBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        backBtn.setBorderPainted(false);
+        backBtn.setContentAreaFilled(false);
         card.add(backBtn);
         
         // card.add(new JLabel("Scientific Field:"));
@@ -115,6 +127,9 @@ public final class RegisterPanel extends JPanel {
         label.setForeground(new Color(149, 165, 166));
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        panel.add(label);
+        panel.add(Box.createRigidArea(new Dimension(0, 3)));
+
         if (field instanceof JTextField) {
             field.setMaximumSize(new Dimension(280, 32));
             field.setBorder(BorderFactory.createCompoundBorder(
@@ -123,30 +138,30 @@ public final class RegisterPanel extends JPanel {
             ));
         }
 
-        panel.add(label);
-        panel.add(Box.createRigidArea(new Dimension(0, 3)));
+        field.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         panel.add(field);
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
     }
 
     // Methods for controller
+    public String role() {
+        return roleSwitcher.currentRole();
+    }
+
     public String selectedFieldName() {
         return (String) fieldCombo.getSelectedItem();
     }
 
     public void setFieldNames(List<String> names) {
-        // Remove all items in order to list would be clear.
         fieldCombo.removeAllItems();
-        for (String name : names) {
-            fieldCombo.addItem(name);
-        }
+        names.forEach(fieldCombo::addItem);
     }
 
     public String username() { return usernameField.getText(); }
     public String email() { return emailField.getText(); }
     public String fullName() { return fullNameField.getText(); }
     public String password() { return new String(passwordField.getPassword()); }
-    public String role() { return (String) roleCombo.getSelectedItem(); }
 
     public void onRegister(Runnable action) {
         registerBtn.addActionListener(e -> action.run());

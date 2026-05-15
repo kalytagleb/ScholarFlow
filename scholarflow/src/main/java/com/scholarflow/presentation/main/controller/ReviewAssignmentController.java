@@ -85,6 +85,11 @@ public final class ReviewAssignmentController {
             return;
         }
 
+        if (deadline.isBefore(LocalDate.now())) {
+            view.displayError(translator.translate("error.past_date"));
+            return;
+        }
+
         final User selectedReviewer = availableReviewers.stream()
             .filter(u -> u.fullName().equals(reviewerName))
             .findFirst()

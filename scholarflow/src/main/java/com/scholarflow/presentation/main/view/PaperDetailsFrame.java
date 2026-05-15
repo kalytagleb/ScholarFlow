@@ -2,6 +2,7 @@ package com.scholarflow.presentation.main.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -14,9 +15,12 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
 import com.scholarflow.business.model.Paper;
@@ -26,9 +30,11 @@ import com.scholarflow.business.service.InteractionService;
 import com.scholarflow.business.service.ReviewService;
 import com.scholarflow.business.service.Translator;
 import com.scholarflow.business.service.UserService;
+import com.scholarflow.presentation.common.Card;
 import com.scholarflow.presentation.common.StatusBadge;
 import com.scholarflow.presentation.main.controller.InteractionController;
 import com.scholarflow.presentation.main.controller.ReviewAssignmentController;
+import com.scholarflow.presentation.main.controller.ReviewSubmitController;
 
 public final class PaperDetailsFrame {
     private final JFrame frame;
@@ -40,6 +46,7 @@ public final class PaperDetailsFrame {
     private final InteractionService interactionService;
     private JButton likeBtn;
     private JLabel likeCountLabel;
+    private JButton submitActionBtn;
 
     public PaperDetailsFrame(
         final Paper paper, 
@@ -60,16 +67,22 @@ public final class PaperDetailsFrame {
     }
 
     private void setupUI() {
-        frame.setSize(700, 600);
+        frame.setSize(800, 750);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        JPanel root = new JPanel(new BorderLayout(0, 20));
-        root.setBackground(Color.WHITE);
-        root.setBorder(new EmptyBorder(30, 30, 30, 30));
+        JPanel root = new JPanel(new BorderLayout(0, 0));
+        root.setBackground(new Color(245, 246, 250));
 
         root.add(createHeaderSection(), BorderLayout.NORTH);
-        root.add(createContentSection(), BorderLayout.CENTER);
+
+        JPanel contentArea = createContentSection();
+        JScrollPane mainScroll = new JScrollPane(contentArea);
+        mainScroll.setBorder(null);
+        mainScroll.getVerticalScrollBar().setUnitIncrement(16);
+        mainScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        root.add(mainScroll, BorderLayout.CENTER);
         root.add(createFooterSection(), BorderLayout.SOUTH);
 
         frame.add(root);
@@ -78,6 +91,10 @@ public final class PaperDetailsFrame {
     private JPanel createHeaderSection() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.WHITE);
+        panel.setBorder(new CompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 221, 225)),
+            new EmptyBorder(20, 25, 20, 25)
+        ));
 
         JLabel title = new JLabel("<html><body style='width: 450px'>" + paper.title() + "</body></html>");
         title.setFont(new Font("Segoe UI", Font.BOLD, 24));
@@ -115,25 +132,33 @@ public final class PaperDetailsFrame {
     private JPanel createContentSection() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(Color.WHITE);
+        panel.setBackground(new Color(245, 246, 250));
+        panel.setBorder(new EmptyBorder(20, 20, 20, 25));
+
+        Card abstractCard = new Card(25);
+        abstractCard.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel absHeader = new JLabel(translator.translate("details.abstract"));
-        absHeader.setFont(new Font("Segoe UI", Font.ITALIC, 13));
-        panel.add(absHeader);
-        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        absHeader.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        absHeader.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JTextArea area = new JTextArea(paper.paperAbstract());
-        area.setFont(new Font("Segoe UI", Font.ITALIC, 13));
-        area.setLineWrap(true);
-        area.setWrapStyleWord(true);
-        area.setEditable(false);
-        area.setBackground(new Color(248, 249, 250));
+        JTextArea absText = new JTextArea(paper.paperAbstract());
+        absText.setFont(new Font("Segoe UI", Font.ITALIC, 13));
+        absText.setLineWrap(true);
+        absText.setWrapStyleWord(true);
+        absText.setEditable(false);
+        absText.setOpaque(false);
+        absText.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JScrollPane scroll = new JScrollPane(area);
-        scroll.setPreferredSize(new Dimension(0, 200));
-        panel.add(scroll);
+        abstractCard.add(absHeader);
+        abstractCard.add(Box.createRigidArea(new Dimension(0, 10)));
+        abstractCard.add(absText);
+
+        panel.add(abstractCard);
+        panel.add(Box.createRigidArea(new Dimension(0, 25)));
 
         PaperCommentsPanel commentsView = new PaperCommentsPanel(translator);
+        commentsView.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         new InteractionController(
             interactionService,
@@ -146,8 +171,39 @@ public final class PaperDetailsFrame {
 
         panel.add(commentsView);
 
+        // For reviewer
+        if (currentUser.canReview()) {
+            var myTask = reviewService.findActiveAssignment(
+                paper.id().orElseThrow(),
+                currentUser.id().orElseThrow()
+            );
+
+            if (myTask.isPresent()) {
+                panel.add(Box.createRigidArea(new Dimension(0, 25)));
+                ReviewSubmitPanel submitView = new ReviewSubmitPanel(translator);
+                submitView.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+                new ReviewSubmitController(
+                    reviewService, 
+                    translator, 
+                    myTask.get().id().get(), 
+                    submitView, 
+                    () -> {
+                        submitView.setVisible(false);
+                        JOptionPane.showMessageDialog(null, translator.translate("review.submit_success"));
+                    }
+                );
+
+                panel.add(submitView);
+            }
+        }
+
+        // For admin
         if (currentUser.hasAdminPrivileges() && paper.status() != PaperStatus.ACCEPTED) {
+            panel.add(Box.createRigidArea(new Dimension(0, 25)));
+
             ReviewAssignmentPanel assignView = new ReviewAssignmentPanel(translator);
+            assignView.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             new ReviewAssignmentController(
                 reviewService, 
@@ -165,11 +221,20 @@ public final class PaperDetailsFrame {
     }
 
     private JPanel createFooterSection() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 15));
+        panel.setOpaque(false);
         panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(220, 221, 225)));
 
         JButton closeButton = new JButton(translator.translate("common.close"));
         closeButton.addActionListener(e -> frame.dispose());
+
+        if (currentUser.id().get().equals(paper.submitterId()) && paper.status() == PaperStatus.DRAFT) {
+            submitActionBtn = new JButton(translator.translate("details.submit_action"));
+            submitActionBtn.setBackground(new Color(46, 204, 113));
+            submitActionBtn.setForeground(Color.WHITE);
+            panel.add(submitActionBtn);
+        }
 
         panel.add(closeButton);
         return panel;
@@ -183,7 +248,17 @@ public final class PaperDetailsFrame {
         likeCountLabel.setText(String.valueOf(count));
     }
 
+    public void onSubmitClick(Runnable action) {
+        if (submitActionBtn != null) {
+            submitActionBtn.addActionListener(e -> action.run());
+        }
+    }
+
     public void open() {
         frame.setVisible(true);
+    }
+
+    public void close() {
+        frame.dispose();
     }
 }

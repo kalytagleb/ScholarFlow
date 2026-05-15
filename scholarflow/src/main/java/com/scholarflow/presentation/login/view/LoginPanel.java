@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -23,6 +24,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import com.scholarflow.business.service.Translator;
+import com.scholarflow.presentation.common.LanguageSwitcher;
 import com.scholarflow.presentation.common.PrimaryButton;
 
 public final class LoginPanel extends JPanel {
@@ -38,11 +40,12 @@ public final class LoginPanel extends JPanel {
     private final JButton registerLink;
 
     // Language choice: EN or SK
-    private final JComboBox<String> langCombo = new JComboBox<>(new String[]{"English", "Slovenčina"});
+    private final LanguageSwitcher langSwitcher;
 
     public LoginPanel(final Translator translator) {
         this.loginBtn = new PrimaryButton(translator.translate("login.signin"));
         this.registerLink = new JButton(translator.translate("login.register_link"));
+        this.langSwitcher = new LanguageSwitcher(translator.currentLanguage());
 
         this.setLayout(new GridBagLayout());
         this.setBackground(new Color(245, 246, 250));
@@ -57,8 +60,6 @@ public final class LoginPanel extends JPanel {
         passLabel.setText(translator.translate("login.password"));
         loginBtn.setText(translator.translate("login.signin"));
         registerLink.setText(translator.translate("login.register_link"));
-
-        langCombo.setSelectedItem(translator.currentLanguage().equals("sk") ? "Slovenčina" : "English");
     }
 
     private void setupLayout() {
@@ -70,27 +71,28 @@ public final class LoginPanel extends JPanel {
             new EmptyBorder(30, 30, 30, 30)
         ));
 
-        langCombo.setMaximumSize(new Dimension(120, 25));
-        langCombo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        langSwitcher.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        loginBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        registerLink.setAlignmentX(Component.CENTER_ALIGNMENT);
+        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel title = new JLabel("Scholarflow");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 32));
-        title.setForeground(new Color(44, 62, 80));
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        titleLabel.setForeground(new Color(44, 62, 80));
 
         this.styleInputField(usernameField);
         this.styleInputField(passwordField);
 
-        card.add(langCombo);
+        card.add(langSwitcher);
         card.add(Box.createRigidArea(new Dimension(0,20)));
-        card.add(title);
+        card.add(titleLabel);
         card.add(Box.createRigidArea(new Dimension(0,30)));
 
         this.addLabeledField(card, userLabel, usernameField);
         this.addLabeledField(card, passLabel, passwordField);
 
         card.add(errorLabel);
-        card.add(Box.createRigidArea(new Dimension(0, 20)));
+        card.add(Box.createRigidArea(new Dimension(0, 10)));
         card.add(loginBtn);
 
         this.styleLinkButton(registerLink);
@@ -104,6 +106,8 @@ public final class LoginPanel extends JPanel {
         label.setFont(new Font("Segoe UI", Font.BOLD, 12));
         label.setForeground(new Color(127, 140, 141));
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        field.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         panel.add(label);
         panel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -135,9 +139,6 @@ public final class LoginPanel extends JPanel {
     // In order to controller had access to Panel
     public String username() { return usernameField.getText(); }
     public String password() { return new String(passwordField.getPassword()); }
-    public String selectedLanguage() {
-        return "Slovenčina".equals(langCombo.getSelectedItem()) ? "sk" : "en";
-    }
 
     public void onLogin(Runnable action) {
         loginBtn.addActionListener(e -> action.run());
@@ -147,12 +148,13 @@ public final class LoginPanel extends JPanel {
         registerLink.addActionListener(e -> action.run());
     }
 
-    public void onLanguageChange(Runnable action) {
-        langCombo.addActionListener(e -> action.run());
+    public void onLanguageToggle(Consumer<String> action) {
+        langSwitcher.onLanguageChange(action);
     }
 
     public void displayError(String msg) {
         errorLabel.setText(msg);
+        errorLabel.setForeground(new Color(231, 76, 60));
     }
 
     // Button block (in order to user don't spam when do request to DB)
